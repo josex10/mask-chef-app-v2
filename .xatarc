@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Jose-Manuel-Badilla-Porras-s-workspace-nc0781.us-east-1.xata.sh/db/mask-chef-app-v2",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
