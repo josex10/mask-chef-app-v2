@@ -2,7 +2,8 @@
 
 import IAuthProfile from "@/utils/interfaces/private/admin/profile";
 import { CookieSchemaSchema } from "@/utils/schemas/shared/cookieSchema";
-import { cookies } from 'next/headers'
+import { get } from "http";
+import { cookies } from "next/headers";
 export const validateCookie = (cookie: any) => {
   if (!cookie) return false;
   const validation = CookieSchemaSchema.safeParse(JSON.parse(cookie));
@@ -12,16 +13,21 @@ export const validateCookie = (cookie: any) => {
   return true;
 };
 
-export const getCookie = async()=>{
+export const getCookie = async () => {
   const cookieStore = cookies();
   const cookieName = process.env.MASK_CHEF_APP_COOKIE_NAME;
-  if(!cookieName){
+  if (!cookieName) {
     return null;
   }
 
   const cookie = cookieStore.get(cookieName);
-  if(!cookie) return null;
+  if (!cookie) return null;
 
   return JSON.parse(cookie.value) as IAuthProfile;
-}
+};
 
+export const getSelectedRestaurantFromCookie = async () => {
+  const cookie = await getCookie();
+  if (!cookie) return null;
+  return cookie.restaurantSelected;
+};

@@ -13,6 +13,7 @@ import { IExpensesSummary } from "@/utils/interfaces/private/admin/expensesSumma
 import { ExpenseSummarySchema } from "@/utils/schemas/private/ExpenseSummarySchema";
 import { IExpensesLineDetail } from "@/utils/interfaces/private/admin/expensesLineDetail";
 import { GroupExpenseLineDetailSchema } from "@/utils/schemas/private/ExpenseLineDetailSchema";
+import { error } from "console";
 
 type TCreateExpenseFromXml = {
   error: boolean;
@@ -87,11 +88,11 @@ export const createExpenseFromXml = async (
     return { error: true, message: providerResponse.message };
   }
 
-  //CREATE THE EXPENSE SUMMARY
-  const expenseSummaryResponse = await createExpenseSummaryOnDb(ResumenFactura);
-  if (expenseSummaryResponse.error && !expenseSummaryResponse.summaryId) {
-    return { error: true, message: expenseSummaryResponse.message };
-  }
+   //CREATE THE EXPENSE SUMMARY
+   const expenseSummaryResponse = await createExpenseSummaryOnDb(ResumenFactura);
+   if (expenseSummaryResponse.error && !expenseSummaryResponse.summaryId) {
+     return { error: true, message: expenseSummaryResponse.message };
+   }
 
   //CREATE THE EXPENSE DOCUMENT AND RETURN THE ID
   const expenseResponse = await createExpenseOnDb(
@@ -105,10 +106,13 @@ export const createExpenseFromXml = async (
     return { error: true, message: expenseResponse.message };
   }
 
+ 
+
   //CREATE THE EXPENSE LINE DETAIL
   const lineDetailResponse = await createExpenseLineDetailOnDb(
     DetalleServicio.LineaDetalle,
-    expenseResponse.expenseId as string
+    expenseResponse.expenseId as string,
+    expenseSummaryResponse.summaryId as string
   );
   if (lineDetailResponse.error) {
     return { error: true, message: lineDetailResponse.message };
@@ -161,60 +165,6 @@ const checkExpenseAndRestLegalNumber = (
   };
 };
 
-type TCreateExpenseOnDb = {
-  error: boolean;
-  message: string | null;
-  expenseId: string | null;
-};
-
-const createExpenseOnDb = async (
-  expense: any,
-  restaurant: IRestaurant,
-  user: IUser,
-  providerId: string,
-  summaryId: string
-): Promise<TCreateExpenseOnDb> => {
-  const newExpense: IExpense = {
-    clave: expense.Clave,
-    codigoActividad: expense.CodigoActividad,
-    numeroConsecutivo: expense.NumeroConsecutivo,
-    fechaEmision: new Date(expense.FechaEmision),
-    restaurant: restaurant.id ? restaurant.id : "",
-    createdBy: user.id ? user.id : "",
-    provider: providerId,
-    expenseSummary: summaryId,
-  };
-  const validation = ExpenseSchema.safeParse(newExpense);
-  if (validation.error) {
-    return {
-      error: true,
-      message: "Error validating the expense",
-      expenseId: null,
-    };
-  }
-
-  try {
-    const xata = getXataClient();
-
-    const filterExpense = await xata.db.expenses
-      .filter({ clave: newExpense.clave })
-      .getFirst();
-    if (filterExpense)
-      return {
-        error: true,
-        message: "The expense 'CLAVE' is already on the system.",
-        expenseId: null,
-      };
-    const storedExpense = await xata.db.expenses.create(newExpense);
-    return { error: false, message: null, expenseId: storedExpense.id };
-  } catch (error) {
-    return {
-      error: true,
-      message: "Error creating the expense.",
-      expenseId: null,
-    };
-  }
-};
 
 const createProviderOnDb = async (
   provider: any,
@@ -232,8 +182,8 @@ const createProviderOnDb = async (
     restaurant: restaurant.id ? restaurant.id : "",
     name: provider.Nombre,
     legalNumber: provider.Identificacion.Numero,
-    comercialName: provider.NombreComercial,
-    phone: provider.Telefono?.NumTelefono ? provider.Telefono?.NumTelefono : "",
+    comercialName: provider.NombreComercial || "",
+    phone: provider.Telefono?.NumTelefono || "",
     email: provider.CorreoElectronico,
     createdBy: user.id ? user.id : "",
   };
@@ -278,6 +228,13 @@ const createProviderOnDb = async (
     };
   }
 };
+
+type TCreateExpenseOnDb = {
+  error: boolean;
+  message: string | null;
+  expenseId: string | null;
+};
+
 
 const createExpenseSummaryOnDb = async (summary: any) => {
   if (!summary)
@@ -352,80 +309,132 @@ const createExpenseSummaryOnDb = async (summary: any) => {
   }
 };
 
-const createExpenseLineDetailOnDb = async (
-  lineDetail: any,
-  expenseId: string
-) => {
-  if (!lineDetail)
-    return {
-      error: true,
-      message:
-        "The purchase XML does not provide the 'Line Detail' information.",
-    };
-
-  let groupOfLineDetail: IExpensesLineDetail[] = [];
-  if (Array.isArray(lineDetail)) {
-    lineDetail.forEach((line) => {
-      groupOfLineDetail.push({
-        expense: expenseId,
-        NumeroLinea: line.NumeroLinea ? Number(line.NumeroLinea) : 0,
-        Codigo: line.Codigo ? line.Codigo : "",
-        UnidadMedida: line.UnidadMedida ? line.UnidadMedida : "",
-        Detalle: line.Detalle ? line.Detalle : "",
-        PrecioUnitario: line.PrecioUnitario ? Number(line.PrecioUnitario) : 0,
-        MontoTotal: line.MontoTotal ? Number(line.MontoTotal) : 0,
-        SubTotal: line.SubTotal ? Number(line.SubTotal) : 0,
-        ImpuestoTarifa: line.Impuesto.Tarifa ? Number(line.Impuesto.Tarifa) : 0,
-        ImpuestoMonto: line.Impuesto.Monto ? Number(line.Impuesto.Monto) : 0,
-        ImpuestoNeto: line.Impuesto.Neto ? Number(line.Impuesto.Neto) : 0,
-        MontoTotalLinea: line.MontoTotalLinea
-          ? Number(line.MontoTotalLinea)
-          : 0,
-      });
-    });
-  } else {
-    groupOfLineDetail.push({
-      expense: expenseId,
-      NumeroLinea: lineDetail.NumeroLinea ? Number(lineDetail.NumeroLinea) : 0,
-      Codigo: lineDetail.Codigo ? lineDetail.Codigo : "",
-      UnidadMedida: lineDetail.UnidadMedida ? lineDetail.UnidadMedida : "",
-      Detalle: lineDetail.Detalle ? lineDetail.Detalle : "",
-      PrecioUnitario: lineDetail.PrecioUnitario
-        ? Number(lineDetail.PrecioUnitario)
-        : 0,
-      MontoTotal: lineDetail.MontoTotal ? Number(lineDetail.MontoTotal) : 0,
-      SubTotal: lineDetail.SubTotal ? Number(lineDetail.SubTotal) : 0,
-      ImpuestoTarifa: lineDetail.Impuesto.Tarifa
-        ? Number(lineDetail.Impuesto.Tarifa)
-        : 0,
-      ImpuestoMonto: lineDetail.Impuesto.Monto
-        ? Number(lineDetail.Impuesto.Monto)
-        : 0,
-      ImpuestoNeto: lineDetail.Impuesto.Neto
-        ? Number(lineDetail.Impuesto.Neto)
-        : 0,
-      MontoTotalLinea: lineDetail.MontoTotalLinea
-        ? Number(lineDetail.MontoTotalLinea)
-        : 0,
-    });
-  }
-
-  if (groupOfLineDetail.length === 0) {
-    return {
-      error: false,
-      message: "Any line detail to create",
-    };
-  }
-
-  const validation = GroupExpenseLineDetailSchema.safeParse(groupOfLineDetail);
+const createExpenseOnDb = async (
+  expense: any,
+  restaurant: IRestaurant,
+  user: IUser,
+  providerId: string,
+  summaryId: string
+): Promise<TCreateExpenseOnDb> => {
+  const newExpense: IExpense = {
+    clave: expense.Clave,
+    codigoActividad: expense.CodigoActividad,
+    numeroConsecutivo: expense.NumeroConsecutivo,
+    fechaEmision: new Date(expense.FechaEmision),
+    restaurant: restaurant.id ? restaurant.id : "",
+    createdBy: user.id ? user.id : "",
+    provider: providerId,
+    expenseSummary: summaryId,
+  };
+  const validation = ExpenseSchema.safeParse(newExpense);
   if (validation.error) {
     return {
       error: true,
-      message: "Error validating the expense line detail",
+      message: "Error validating the expense",
+      expenseId: null,
     };
   }
 
   try {
+    const xata = getXataClient();
+
+    const filterExpense = await xata.db.expenses
+      .filter({ clave: newExpense.clave })
+      .getFirst();
+    if (filterExpense)
+      return {
+        error: true,
+        message: "The expense 'CLAVE' is already on the system.",
+        expenseId: null,
+      };
+    const storedExpense = await xata.db.expenses.create(newExpense);
+    return { error: false, message: null, expenseId: storedExpense.id };
+  } catch (error) {
+    await removeExpenseOnErrorCase(null, summaryId);
+    return {
+      error: true,
+      message: "Error creating the expense.",
+      expenseId: null,
+    };
+  }
+};
+
+const createExpenseLineDetailOnDb = async (
+  lineDetail: any,
+  expenseId: string,
+  summaryId: string
+) => {
+  try {
+
+    if (!lineDetail)
+      return {
+        error: true,
+        message:
+          "The purchase XML does not provide the 'Line Detail' information.",
+      };
+  
+    let groupOfLineDetail: IExpensesLineDetail[] = [];
+    if (Array.isArray(lineDetail)) {
+      lineDetail.forEach((line) => {
+        groupOfLineDetail.push({
+          expense: expenseId,
+          NumeroLinea: line.NumeroLinea ? Number(line.NumeroLinea) : 0,
+          Codigo: line.Codigo ? line.Codigo : "",
+          UnidadMedida: line.UnidadMedida ? line.UnidadMedida : "",
+          Detalle: line.Detalle ? line.Detalle : "",
+          PrecioUnitario: line.PrecioUnitario ? Number(line.PrecioUnitario) : 0,
+          MontoTotal: line.MontoTotal ? Number(line.MontoTotal) : 0,
+          SubTotal: line.SubTotal ? Number(line.SubTotal) : 0,
+          ImpuestoTarifa: line.Impuesto?.Tarifa ? Number(line.Impuesto.Tarifa) : 0,
+          ImpuestoMonto: line.Impuesto?.Monto ? Number(line.Impuesto.Monto) : 0,
+          ImpuestoNeto: line.Impuesto?.Neto ? Number(line.Impuesto.Neto) : 0,
+          MontoTotalLinea: line.MontoTotalLinea
+            ? Number(line.MontoTotalLinea)
+            : 0,
+        });
+      });
+    } else {
+      groupOfLineDetail.push({
+        expense: expenseId,
+        NumeroLinea: lineDetail.NumeroLinea ? Number(lineDetail.NumeroLinea) : 0,
+        Codigo: lineDetail.Codigo ? lineDetail.Codigo : "",
+        UnidadMedida: lineDetail.UnidadMedida ? lineDetail.UnidadMedida : "",
+        Detalle: lineDetail.Detalle ? lineDetail.Detalle : "",
+        PrecioUnitario: lineDetail.PrecioUnitario
+          ? Number(lineDetail.PrecioUnitario)
+          : 0,
+        MontoTotal: lineDetail.MontoTotal ? Number(lineDetail.MontoTotal) : 0,
+        SubTotal: lineDetail.SubTotal ? Number(lineDetail.SubTotal) : 0,
+        ImpuestoTarifa: lineDetail.Impuesto?.Tarifa
+          ? Number(lineDetail.Impuesto.Tarifa)
+          : 0,
+        ImpuestoMonto: lineDetail.Impuesto?.Monto
+          ? Number(lineDetail.Impuesto.Monto)
+          : 0,
+        ImpuestoNeto: lineDetail.Impuesto?.Neto
+          ? Number(lineDetail.Impuesto.Neto)
+          : 0,
+        MontoTotalLinea: lineDetail.MontoTotalLinea
+          ? Number(lineDetail.MontoTotalLinea)
+          : 0,
+      });
+    }
+  
+    if (groupOfLineDetail.length === 0) {
+      return {
+        error: false,
+        message: "Any line detail to create",
+      };
+    }
+  
+    const validation = GroupExpenseLineDetailSchema.safeParse(groupOfLineDetail);
+    if (validation.error) {
+      return {
+        error: true,
+        message: "Error validating the expense line detail",
+      };
+    }
+
     const xata = getXataClient();
 
     await xata.db.expenses_line_detail.create(groupOfLineDetail);
@@ -434,10 +443,35 @@ const createExpenseLineDetailOnDb = async (
       message: "New expense line detail created.",
     };
   } catch (error) {
+    await removeExpenseOnErrorCase(expenseId, summaryId);
     return {
       error: true,
       message: "Error creating the expense line detail.",
     };
+  }
+};
+
+const removeExpenseOnErrorCase = async (expenseId: string | null, summaryId: string) => {
+  const xata = getXataClient();
+
+  if(expenseId){
+    try {
+      await xata.sql`DELETE FROM "expenses_line_detail" WHERE expense=${expenseId}`;
+    } catch (error) {
+      console.log('Error removing line detail');
+    }
+  
+    try {
+      await xata.db.expenses.delete(expenseId);
+    } catch (error) {
+      console.log('Error removing expense');
+    }
+  }
+
+  try {
+    await xata.db.expenses_summary.delete(summaryId);
+  } catch (error) {
+    console.log('Error removing summary');
   }
 };
 

@@ -12,6 +12,7 @@ import {
 } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { Toaster } from "react-hot-toast";
+import { ReactQueryProvider } from "./providerReactQuery";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -30,12 +31,13 @@ export default function RootLayout({
 }>) {
   const { userId } = auth();
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning={true}>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
+        suppressHydrationWarning={true}
       >
         <ClerkProvider afterSignOutUrl={"/sign-out"}>
           <Provider
@@ -44,13 +46,15 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <header>
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-            </header>
-            <Toaster/>
-            {children}
+            {/* <div>
+                <SignedOut>
+                  <SignInButton />
+                </SignedOut>
+              </div> */}
+            <ReactQueryProvider>
+              <Toaster />
+              {children}
+            </ReactQueryProvider>
           </Provider>
         </ClerkProvider>
       </body>

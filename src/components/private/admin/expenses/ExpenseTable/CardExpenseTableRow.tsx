@@ -1,23 +1,36 @@
+"use client";
+
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { convertDateToStandard } from "@/utils/helpers/dates";
-
-const cutExpenseClave = (clave: string) => {
-  if (!clave) return "N/A";
-  if (clave.length > 30) {
-    return `...${clave.slice(30)}`;
-  }
-  return clave;
-};
+import { cutExpenseClave } from "@/utils/helpers/expenses";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const CardExpenseTableRow = ({ expense }: any) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathName = usePathname();
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+
   const totalAmount = expense.expenseSummary.TotalComprobante
     ? expense.expenseSummary.TotalComprobante
     : 0;
 
+  const handleOnClick = () => {
+    if (startDate || endDate) {
+      router.push(
+        `${pathName}?startDate=${startDate}&endDate=${endDate}&expenseId=${expense.id}`,
+        { scroll: false }
+      );
+      return;
+    }
+    router.push(`${pathName}?expenseId=${expense.id}`, { scroll: false });
+  };
+
   return (
-    <TableRow>
+    <TableRow onClick={handleOnClick}>
       <TableCell>
         <div className="font-medium">
           {expense.provider.name ? expense.provider.name : "N/A"}
@@ -44,9 +57,6 @@ const CardExpenseTableRow = ({ expense }: any) => {
       <TableCell className="hidden md:table-cell">
         <TextFieldForCurrency totalAmount={totalAmount} />
       </TableCell>
-      {/* <TableCell className="text-right">
-        {expense.createdBy.email ? expense.createdBy.email : "NA"}
-      </TableCell> */}
     </TableRow>
   );
 };
