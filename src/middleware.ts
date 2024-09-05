@@ -27,7 +27,6 @@ export default clerkMiddleware(async(auth, req) => {
     auth().protect();
 
     if(validateCookie(appCookie)){
-      console.log("STAGEEEEEEEEEEEE COOKIE OK")
       return NextResponse.redirect(new URL("/private/admin", req.url))
     }
 

@@ -7,7 +7,7 @@ npm install
 
 Xata Db pull changes:
 
-Use ```bash xata pull main```  to regenerate code and types from your Xata database
+Use ```xata pull main```  to regenerate code and types from your Xata database
 
 
 First, run the development server:

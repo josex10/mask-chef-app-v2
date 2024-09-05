@@ -128,7 +128,10 @@ const tables = [
         unique: true,
       },
     ],
-    revLinks: [{ column: "expense", table: "expenses_line_detail" }],
+    revLinks: [
+      { column: "expense", table: "expenses_line_detail" },
+      { column: "expense", table: "expenses_summary" },
+    ],
   },
   {
     name: "expense_status",
@@ -253,6 +256,7 @@ const tables = [
         notNull: true,
         defaultValue: "0",
       },
+      { name: "expense", type: "link", link: { table: "expenses" } },
     ],
     revLinks: [{ column: "expenseSummary", table: "expenses" }],
   },
@@ -306,6 +310,7 @@ const tables = [
         notNull: true,
         defaultValue: "0",
       },
+      { name: "Cantidad", type: "int", notNull: true, defaultValue: "0" },
     ],
   },
 ] as const;

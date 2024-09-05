@@ -1,5 +1,6 @@
 import AdminNavbarComponent from "@/components/private/admin/navbar/AdminNavbar";
 import AdminSidebarComponent from "@/components/private/admin/sidebar/AdminSidebar";
+import { PrivateProvider } from "./provider";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,7 @@ export default function RootLayout({
       <AdminSidebarComponent />
       <div className="flex flex-col">
         <AdminNavbarComponent />
-        {children}
+        <PrivateProvider>{children}</PrivateProvider>
       </div>
     </div>
   );
