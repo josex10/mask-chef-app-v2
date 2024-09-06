@@ -24,6 +24,7 @@ import {
 } from "@/utils/helpers/dates";
 
 import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
+import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 
 const CardExpenseTable = () => {
   const searchParams = useSearchParams();
@@ -42,8 +43,6 @@ const CardExpenseTable = () => {
     invoiceKey: searchParams.get("invoiceKey") || null,
   };
 
-  console.log({ expenseFilter });
-
   const { data: expenses, isLoading } = useQuery<string | null>({
     queryKey: [
       "expensesTable",
@@ -51,8 +50,7 @@ const CardExpenseTable = () => {
       expenseFilter.endDate,
       String(expenseFilter.invoiceKey),
     ],
-    queryFn: async () => await getAllExpenses(expenseFilter),
-    select: (data) => (data ? JSON.parse(data) : []),
+    queryFn: async () => await getAllExpenses(expenseFilter)
   });
 
   //TODO: CREATE A LOCADING SKELLETON COMPONENT FOR THIS
@@ -62,14 +60,10 @@ const CardExpenseTable = () => {
   if (!expenses || expenses.length === 0)
     return <div>No hay gastos registrados</div>;
 
+  const expensesData = JSON.parse(expenses) as IGroupExpenseTable[];
+
   return (
     <Card x-chunk="dashboard-05-chunk-3">
-      {/* <CardHeader className="px-7">
-        <CardTitle>Gastos</CardTitle>
-        <CardDescription>
-          Ultimos gastos registrados en el sistema.
-        </CardDescription>
-      </CardHeader> */}
       <CardContent>
         <Table>
           <TableHeader>
@@ -82,7 +76,7 @@ const CardExpenseTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {expenses.map((expense, index) => (
+            {expensesData.map((expense, index) => (
               <CardExpenseTableRow key={index} expense={expense} />
             ))}
           </TableBody>
