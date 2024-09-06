@@ -1,12 +1,13 @@
-'use client'
+'use client';
 
 import { useClerk } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-const SignOutPage = async() => {
+const SignOutPage = () => {
     const { signOut } = useClerk();
-    await signOut();
+    signOut();
     redirect('/');
+    
 }
 
 export default SignOutPage

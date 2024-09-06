@@ -40,13 +40,13 @@ const DashboardChartComponent = () => {
         }}
       >
         <CartesianGrid vertical={false} />
-        <XAxis
+        {/* <XAxis
           dataKey="day"
           tickLine={false}
           axisLine={false}
           tickMargin={8}
           tickFormatter={(value) => value.slice(0, 3)}
-        />
+        /> */}
         <ChartTooltip
           cursor={false}
           content={<ChartTooltipContent indicator="dot" />}

@@ -5,18 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { convertDateToStandard } from "@/utils/helpers/dates";
 import { cutExpenseClave } from "@/utils/helpers/expenses";
+import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-const CardExpenseTableRow = ({ expense }: any) => {
+type TCardExpenseProp = {
+  expense: IGroupExpenseTable;
+};
+
+const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathName = usePathname();
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
-
-  const totalAmount = expense.expenseSummary.TotalComprobante
-    ? expense.expenseSummary.TotalComprobante
-    : 0;
 
   const handleOnClick = () => {
     if (startDate || endDate) {
@@ -33,7 +34,7 @@ const CardExpenseTableRow = ({ expense }: any) => {
     <TableRow onClick={handleOnClick}>
       <TableCell>
         <div className="font-medium">
-          {expense.provider.name ? expense.provider.name : "N/A"}
+          {expense.providerName}
         </div>
         <div className="hidden text-sm text-muted-foreground md:inline">
           {cutExpenseClave(expense.clave)}
@@ -50,12 +51,10 @@ const CardExpenseTableRow = ({ expense }: any) => {
         </Badge>
       </TableCell>
       <TableCell className="hidden sm:table-cell">
-        {expense.fechaEmision
-          ? convertDateToStandard(String(expense.fechaEmision))
-          : "NA"}
+        {convertDateToStandard(String(expense.fechaEmision))}
       </TableCell>
       <TableCell className="hidden md:table-cell">
-        <TextFieldForCurrency totalAmount={totalAmount} />
+        <TextFieldForCurrency totalAmount={expense.totalComprobante} />
       </TableCell>
     </TableRow>
   );

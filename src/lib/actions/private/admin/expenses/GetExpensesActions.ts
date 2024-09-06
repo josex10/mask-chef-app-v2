@@ -5,6 +5,7 @@ import {
   checkIfUnixDateIsValid,
   convertUnixToDate,
 } from "@/utils/helpers/dates";
+import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
 import { getXataClient } from "@/xata";
@@ -32,18 +33,15 @@ export const getAllExpenses = async (
         "fechaEmision",
         "provider.name",
         "expenseSummary.TotalComprobante",
-        "createdBy.email",
       ])
       .filter({
         $all: [
           { restaurant: resutaurantSelected?.id },
           {
             fechaEmision: { $ge: convertUnixToDate(filter.startDate) },
-            // fechaEmision: { $ge: new Date("2024-01-01T00:00:00Z") },
           },
           {
             fechaEmision: { $lt: convertUnixToDate(filter.endDate) },
-            // fechaEmision: { $lt: new Date("2025-07-22T23:59:59Z") },
           },
         ],
       })
@@ -51,7 +49,18 @@ export const getAllExpenses = async (
       .getMany({
         pagination: { size: 10, offset: offset },
       });
-    return expenses ? JSON.stringify(expenses) : null;
+
+    if (!expenses) return null;
+    const result: IGroupExpenseTable[] = expenses.map((expense) => {
+      return {
+        id: expense.id,
+        clave: expense.clave,
+        fechaEmision: expense.fechaEmision,
+        providerName: expense.provider?.name || "",
+        totalComprobante: expense.expenseSummary?.TotalComprobante || 0,
+      };
+    });
+    return JSON.stringify(result);
   } catch (error) {
     return null;
   }
@@ -120,8 +129,6 @@ export const getSingleExpense = async (
         };
       }),
     };
-
-    console.log(result);
     return result ? JSON.stringify(result) : null;
   } catch (error) {
     return null;

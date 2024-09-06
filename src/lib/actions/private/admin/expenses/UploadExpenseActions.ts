@@ -13,7 +13,6 @@ import { IExpensesSummary } from "@/utils/interfaces/private/admin/expensesSumma
 import { ExpenseSummarySchema } from "@/utils/schemas/private/ExpenseSummarySchema";
 import { IExpensesLineDetail } from "@/utils/interfaces/private/admin/expensesLineDetail";
 import { GroupExpenseLineDetailSchema } from "@/utils/schemas/private/ExpenseLineDetailSchema";
-import { error } from "console";
 
 type TCreateExpenseFromXml = {
   error: boolean;
