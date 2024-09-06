@@ -7,6 +7,7 @@ const SignOutPage = () => {
     const { signOut } = useClerk();
     signOut();
     redirect('/');
+    
 }
 
 export default SignOutPage
