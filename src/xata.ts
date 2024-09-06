@@ -310,7 +310,7 @@ const tables = [
         notNull: true,
         defaultValue: "0",
       },
-      { name: "Cantidad", type: "int", notNull: true, defaultValue: "0" },
+      { name: "Cantidad", type: "float", notNull: true, defaultValue: "1" },
     ],
   },
 ] as const;

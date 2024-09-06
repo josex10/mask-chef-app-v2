@@ -9,24 +9,24 @@ const links = [
     url: "/private/admin",
     badge: null,
   },
-  {
-    label: "Proveedores",
-    icon: <Truck size="25" />,
-    url: "/private/admin/providers",
-    badge: null,
-  },
+  // {
+  //   label: "Proveedores",
+  //   icon: <Truck size="25" />,
+  //   url: "/private/admin/providers",
+  //   badge: null,
+  // },
   {
     label: "Gastos",
     icon: <ReceiptText size="25" />,
     url: "/private/admin/expenses",
     badge: null,
   },
-  {
-    label: "Reportes",
-    icon: <LineChart size="25" />,
-    url: "/private/admin/reports",
-    badge: null,
-  }
+  // {
+  //   label: "Reportes",
+  //   icon: <LineChart size="25" />,
+  //   url: "/private/admin/reports",
+  //   badge: null,
+  // }
 ];
 
 const AdminSidebarLinksComponent = () => {

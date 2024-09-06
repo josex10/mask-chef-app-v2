@@ -12,4 +12,5 @@ export interface IExpensesLineDetail {
     ImpuestoMonto: number;
     ImpuestoNeto: number;
     MontoTotalLinea: number;
+    Cantidad: number;
 }

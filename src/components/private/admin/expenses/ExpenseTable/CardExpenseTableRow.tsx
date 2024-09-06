@@ -10,9 +10,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type TCardExpenseProp = {
   expense: IGroupExpenseTable;
+  expenseId: string | null;
 };
 
-const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
+const CardExpenseTableRow = ({ expense, expenseId }: TCardExpenseProp) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathName = usePathname();
@@ -30,20 +31,16 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
     router.push(`${pathName}?expenseId=${expense.id}`, { scroll: false });
   };
 
+  const selectedClass =
+    expenseId && expense.id === expenseId ? "bg-muted/40" : "";
+
   return (
-    <TableRow onClick={handleOnClick}>
+    <TableRow onClick={handleOnClick} className={selectedClass}>
       <TableCell>
-        <div className="font-medium">
-          {expense.providerName}
-        </div>
+        <div className="font-medium">{expense.providerName}</div>
         <div className="hidden text-sm text-muted-foreground md:inline">
           {cutExpenseClave(expense.clave)}
         </div>
-      </TableCell>
-      <TableCell className="hidden sm:table-cell">
-        <Badge className="text-xs" variant="secondary">
-          Crédito
-        </Badge>
       </TableCell>
       <TableCell className="hidden sm:table-cell">
         <Badge className="text-xs" variant="secondary">
@@ -53,7 +50,7 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
       <TableCell className="hidden sm:table-cell">
         {convertDateToStandard(String(expense.fechaEmision))}
       </TableCell>
-      <TableCell className="hidden md:table-cell">
+      <TableCell className="font-medium">
         <TextFieldForCurrency totalAmount={expense.totalComprobante} />
       </TableCell>
     </TableRow>

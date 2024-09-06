@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,26 +18,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 import { getSingleExpense } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { convertDateToStandard } from "@/utils/helpers/dates";
-import { cutExpenseClave } from "@/utils/helpers/expenses";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  CreditCard,
-  MoreVertical,
-  Truck,
-} from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import CardExpenseDetailSkeleton from "./Skeletons/CardExpenseDetailSkeleton";
+import { cutExpenseClave } from '../../../../utils/helpers/expenses';
 
 const CardExpenseDetail = () => {
   const searchParams = useSearchParams();
@@ -44,33 +34,30 @@ const CardExpenseDetail = () => {
   const expenseId = searchParams.get("expenseId");
 
   const { data: expense, isLoading } = useQuery<string | null>({
-    queryKey: [
-      "singleExpense",
-      String(expenseId)
-    ],
+    queryKey: ["singleExpense", String(expenseId)],
     queryFn: async () => await getSingleExpense(expenseId),
   });
 
-  if(isLoading){
-    return <div>Cargando...</div>
+  if (isLoading) {
+    return <CardExpenseDetailSkeleton />
   }
 
-  if(!expense){
-    return <div>Seleccione un gasto</div>
+  if (!expense) {
+    return  <SharedCenterMessage message="Seleccione un gasto" />;
   }
 
   const expenseData = JSON.parse(expense) as ICustomSingleExpense;
-  
+
   return (
     <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
       <CardHeader className="flex flex-row items-start bg-muted/50">
         <div className="grid gap-0.5">
-          <CardTitle className="text-lg">
-            Detalle del Gasto
-          </CardTitle>
+          <CardTitle className="text-lg">Detalle del Gasto</CardTitle>
           <Separator className="my-2" />
-          <CardDescription>{expenseData.clave}</CardDescription>
-          <CardDescription>Fecha: {convertDateToStandard(String(expenseData.fechaEmision))}</CardDescription>
+          <CardDescription>{cutExpenseClave(expenseData.clave)}</CardDescription>
+          <CardDescription>
+            Fecha: {convertDateToStandard(String(expenseData.fechaEmision))}
+          </CardDescription>
         </div>
         <div className="ml-auto flex items-center gap-1">
           <DropdownMenu>
@@ -92,36 +79,42 @@ const CardExpenseDetail = () => {
         <div className="grid gap-3">
           <div className="font-semibold">Detalle</div>
           <ul className="grid gap-3">
-            {
-              expenseData.lineDetails.map(line => {
-                return (
-                  <li className="flex items-center justify-between" key={line.id}>
-                    <span className="text-muted-foreground">
-                      {line.Detalle} x <span>{line.Cantidad}</span>
-                    </span>
-                    <TextFieldForCurrency totalAmount={line.SubTotal} />
-                  </li>
-                )
-              })
-            }
+            {expenseData.lineDetails.map((line) => {
+              return (
+                <li className="flex items-center justify-between" key={line.id}>
+                  <span className="text-muted-foreground">
+                    {line.Detalle} x <span>{line.Cantidad}</span>
+                  </span>
+                  <TextFieldForCurrency totalAmount={line.SubTotal} />
+                </li>
+              );
+            })}
           </ul>
           <Separator className="my-2" />
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <TextFieldForCurrency totalAmount={expenseData.expenseSummaryTotalVenta} />
+              <TextFieldForCurrency
+                totalAmount={expenseData.expenseSummaryTotalVenta}
+              />
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Descuento</span>
-              <TextFieldForCurrency totalAmount={expenseData.expenseSummaryTotalDescuentos} />
+              <TextFieldForCurrency
+                totalAmount={expenseData.expenseSummaryTotalDescuentos}
+              />
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Impuesto</span>
-              <TextFieldForCurrency totalAmount={expenseData.expenseSummaryTotalImpuesto} />
+              <TextFieldForCurrency
+                totalAmount={expenseData.expenseSummaryTotalImpuesto}
+              />
             </li>
             <li className="flex items-center justify-between font-semibold">
               <span className="text-muted-foreground">Total</span>
-              <TextFieldForCurrency totalAmount={expenseData.expenseSummaryTotalComprobante} />
+              <TextFieldForCurrency
+                totalAmount={expenseData.expenseSummaryTotalComprobante}
+              />
             </li>
           </ul>
         </div>
@@ -163,7 +156,8 @@ const CardExpenseDetail = () => {
       </CardContent>
       <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
         <div className="text-xs text-muted-foreground">
-          Creado por {expenseData.createdByEmail} el {convertDateToStandard(String(expenseData.xataCreatedAt))}
+          Creado por {expenseData.createdByEmail} el{" "}
+          {convertDateToStandard(String(expenseData.xataCreatedAt))}
         </div>
       </CardFooter>
     </Card>

@@ -1,9 +1,7 @@
-const MainPage = async() => {
-  return (
-    <div>
-      <p>Welcome to the home page!</p>
-    </div>
-  );
+import { redirect } from "next/navigation";
+
+const MainPage = async () => {
+  redirect("/sign-in");
 };
 
 export default MainPage;

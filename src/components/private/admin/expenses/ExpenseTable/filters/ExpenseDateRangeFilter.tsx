@@ -14,29 +14,10 @@ import {
 } from "@/components/ui/popover";
 import {
   checkIfUnixDateIsValid,
-  checkUnixStringDateIsValid,
   converDateToUnix,
-  convertUnixToDate,
-  getFilterDates,
 } from "@/utils/helpers/dates";
-import { EFilters } from "@/utils/enums/filters";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-const getStartAndEndDate = (startDate: string | null, endDate: string | null) => {
-  const dates = getFilterDates(EFilters.day);
-  
-  return { startDate : !startDate
-    ? dates.start
-    : checkUnixStringDateIsValid(startDate)
-    ? convertUnixToDate(Number(startDate))
-    : dates.start,
-  endDate : !endDate
-    ? dates.end
-    : checkUnixStringDateIsValid(endDate)
-    ? convertUnixToDate(Number(endDate))
-    : dates.end
-  }
-};
+import { getStartAndEndDateBasedOnDateString } from "@/utils/helpers/expenses";
 
 export function ExpenseDateRangeFilter({
   className,
@@ -46,7 +27,7 @@ export function ExpenseDateRangeFilter({
   const searchParams = useSearchParams();
   const expenseId = searchParams.get("expenseId");
 
-  const { startDate, endDate } = getStartAndEndDate(searchParams.get("startDate"), searchParams.get("endDate"));
+  const { startDate, endDate } = getStartAndEndDateBasedOnDateString(searchParams.get("startDate"), searchParams.get("endDate"));
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: startDate,
@@ -87,6 +68,8 @@ export function ExpenseDateRangeFilter({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(e) => {
+
+              setDate(e);
               if (!e || !e?.from || !e?.to) return;
 
               const startDate = converDateToUnix(e.from);
@@ -97,8 +80,6 @@ export function ExpenseDateRangeFilter({
                 `${pathName}?startDate=${startDate}&endDate=${endDate}${expenseId && `&expenseId=${expenseId}`}`,
                 { scroll: false }
               );
-
-              setDate(e);
             }}
             numberOfMonths={2}
           />

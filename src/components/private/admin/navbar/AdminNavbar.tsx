@@ -12,14 +12,14 @@ const AdminNavbarComponent = async () => {
     redirect("/sign-out");
   }
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+    <header className="flex h-14 items-center gap-4 border-b bg-muted px-4 lg:h-[60px] lg:px-6 sticky top-0 z-50">
       <AdminNavbarStore cookie={cookie} />
       <AdminNavbarSheetComponent />
       <div className="flex-1"></div>
       <div className="flex flex-row gap-4">
         <AdminNavbarRestName />
         <SignedIn>
-          <UserButton showName/>
+          <UserButton/>
         </SignedIn>
 
         <SharedDropdownTheme />

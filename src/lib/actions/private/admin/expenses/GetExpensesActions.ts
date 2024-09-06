@@ -4,6 +4,7 @@ import { getSelectedRestaurantFromCookie } from "@/lib/middleware/cookies";
 import {
   checkIfUnixDateIsValid,
   convertUnixToDate,
+  getStardAndEndDateOfTheDay,
 } from "@/utils/helpers/dates";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
@@ -26,6 +27,9 @@ export const getAllExpenses = async (
       throw new Error("Invalid start date");
     }
 
+    const {start} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.startDate));
+    const {end} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.endDate));
+
     const expenses = await xata.db.expenses
       .select([
         "id",
@@ -38,17 +42,15 @@ export const getAllExpenses = async (
         $all: [
           { restaurant: resutaurantSelected?.id },
           {
-            fechaEmision: { $ge: convertUnixToDate(filter.startDate) },
+            fechaEmision: { $ge: start },
           },
           {
-            fechaEmision: { $lt: convertUnixToDate(filter.endDate) },
+            fechaEmision: { $lt: end },
           },
         ],
       })
       .sort("fechaEmision", "desc")
-      .getMany({
-        pagination: { size: 10, offset: offset },
-      });
+      .getAll();
 
     if (!expenses) return null;
     const result: IGroupExpenseTable[] = expenses.map((expense) => {
@@ -100,7 +102,7 @@ export const getSingleExpense = async (
       .filter({
         expense: expenseId,
       })
-      .getMany();
+      .getAll();
 
     const result: ICustomSingleExpense = {
       id: expense.id,

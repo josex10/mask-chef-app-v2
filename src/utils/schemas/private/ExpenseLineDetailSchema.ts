@@ -14,6 +14,7 @@ export const ExpenseLineDetailSchema = z.object({
     ImpuestoMonto: z.number({ message: EMessages.inputErrorTypeNumber }),
     ImpuestoNeto: z.number({ message: EMessages.inputErrorTypeNumber }),
     MontoTotalLinea: z.number({ message: EMessages.inputErrorTypeNumber }),
+    Cantidad: z.number({ message: EMessages.inputErrorTypeNumber }),
 });
 
 

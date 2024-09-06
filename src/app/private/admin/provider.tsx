@@ -9,6 +9,6 @@ export function PrivateProvider({
 }>) {
   const rest = useStoreAuth((state) => state.selectedRestaurant);
   //TODO: CREATE A LODING PAGE 
-  if(!rest) return (<div>loading...</div>)
+  if(!rest) return (<div>loading TODO PENDING...</div>)
   return <>{children}</>;
 }

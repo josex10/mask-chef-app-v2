@@ -11,8 +11,6 @@ import {
 
 type BreacrumbProps = {};
 const SharedBreadcrumb = () => {
-
-    //TODO: GET BREADCRUMB FROM STATE
   return (
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>

@@ -12,7 +12,9 @@ export default function RootLayout({
       <AdminSidebarComponent />
       <div className="flex flex-col">
         <AdminNavbarComponent />
-        <PrivateProvider>{children}</PrivateProvider>
+        <div className="overflow-auto">
+          <PrivateProvider>{children}</PrivateProvider>
+        </div>
       </div>
     </div>
   );

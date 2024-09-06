@@ -1,35 +1,34 @@
 "use server";
 
-import { getSelectedRestaurantFromCookie } from "@/lib/middleware/cookies";
-import { EFilters } from "@/utils/enums/filters";
-import {
-  getFilterDates,
-  getStardAndEndDateOfTheDay,
-  getStardAndEndDateOfTheMonth,
-  getStardAndEndDateOfTheWeek,
-} from "@/utils/helpers/dates";
+import { getStardAndEndDateOfTheDay } from "@/utils/helpers/dates";
 import { getXataClient } from "@/xata";
+import { isValid } from "date-fns";
 
-export const getExpensesSummary = async (restSelected: string| undefined, filter: EFilters = EFilters.week) => {
+export const getExpensesSummary = async (
+  restSelected: string | undefined,
+  startDate: Date,
+  endDate: Date
+) => {
   try {
     const xata = getXataClient();
     let result = 0;
 
-    if(!restSelected) return result;
+    if (!restSelected) return result;
 
-    const dates = getFilterDates(filter);
+    if (!isValid(endDate) || !isValid(startDate)) return result;
+
+    const {start} = getStardAndEndDateOfTheDay(startDate);
+    const {end} = getStardAndEndDateOfTheDay(endDate);
 
     const records = await xata.db.expenses
       .filter({
         $all: [
-          { restaurant: restSelected},
+          { restaurant: restSelected },
           {
-            'fechaEmision': { $ge: dates.start }
-            // fechaEmision: { $ge: new Date("2024-01-01T00:00:00Z") },
+            fechaEmision: { $ge: start },
           },
           {
-            'fechaEmision': { $lt: dates.end }
-            // fechaEmision: { $lt: new Date("2025-07-22T23:59:59Z") },
+            fechaEmision: { $lt: end },
           },
         ],
       })
@@ -39,7 +38,6 @@ export const getExpensesSummary = async (restSelected: string| undefined, filter
         },
       });
 
-    
     if (
       records.summaries &&
       Array.isArray(records.summaries) &&

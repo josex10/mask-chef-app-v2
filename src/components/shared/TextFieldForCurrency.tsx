@@ -13,6 +13,7 @@ const TextFieldForCurrency = ({ totalAmount }: TTextFieldForCurrency) => {
     : "$";
   return (
     <NumericFormat
+      className="text-nowrap"
       displayType="text"
       prefix={`${currencyName} `}
       thousandSeparator="."

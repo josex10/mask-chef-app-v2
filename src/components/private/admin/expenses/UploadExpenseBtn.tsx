@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { redirect } from "next/navigation";
+import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 import { useForm } from "react-hook-form";
@@ -16,6 +16,13 @@ import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 const UploadExpenseBtn = () => {
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathName = usePathname();
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  
   const { handleSubmit } = useForm();
 
   const [file, setFile] = useState<File | null>(null);
@@ -64,6 +71,7 @@ const UploadExpenseBtn = () => {
             toast.error(xmlResponse.message);
             setIsLoading(false);
           } else {
+            (xmlResponse.expenseId) && handleOnClick(xmlResponse.expenseId);
             toast.success(xmlResponse.message);
             setIsLoading(false);
             setFile(null);
@@ -71,6 +79,16 @@ const UploadExpenseBtn = () => {
         }
       }
     };
+  };
+
+  const handleOnClick = (expenseId: string) => {
+    if (startDate || endDate) {
+      router.push(
+        `${pathName}?startDate=${startDate}&endDate=${endDate}&expenseId=${expenseId}`,
+        { scroll: false }
+      );
+    }
+    router.push(`${pathName}?expenseId=${expenseId}`, { scroll: false });
   };
 
   return (

@@ -17,106 +17,109 @@ import { GroupExpenseLineDetailSchema } from "@/utils/schemas/private/ExpenseLin
 type TCreateExpenseFromXml = {
   error: boolean;
   message: string | null;
+  expenseId: string | null;
 };
 export const createExpenseFromXml = async (
   xmlData: string,
   restaurant: IRestaurant,
   user: IUser
 ): Promise<TCreateExpenseFromXml> => {
-  const xmlToJson = await readXmlData(xmlData);
+  try {
+    const xmlToJson = await readXmlData(xmlData);
 
-  if (!xmlToJson) return { error: true, message: "Error reading the XML" };
+    if (!xmlToJson) throw new Error("Error reading the XML");
 
-  if (!xmlToJson?.FacturaElectronica) {
+    if (!xmlToJson?.FacturaElectronica) {
+      throw new Error(
+        "The XML does not have the 'Factura Electronica' information, Invalid XML format."
+      );
+    }
+    const completeExpense = xmlToJson.FacturaElectronica;
+
+    if (!completeExpense?.Receptor) {
+      throw new Error(
+        "The XML does not have the 'Receptor' information, Invalid XML format."
+      );
+    }
+    const Receptor = completeExpense.Receptor;
+
+    if (!completeExpense?.Emisor) {
+      throw new Error(
+        "The XML does not have the 'Emisor' information, Invalid XML format."
+      );
+    }
+    const Emisor = completeExpense.Emisor;
+
+    if (!completeExpense?.ResumenFactura) {
+      throw new Error(
+        "The XML does not have the 'Resumen de Factura' information, Invalid XML format."
+      );
+    }
+    const ResumenFactura = completeExpense.ResumenFactura;
+
+    if (!completeExpense?.DetalleServicio) {
+      throw new Error(
+        "The XML does not have the 'Detalle de Servicio' information, Invalid XML format."
+      );
+    }
+    const DetalleServicio = completeExpense.DetalleServicio;
+
+    //MATCH LEGAL NUMBER OF THE RESTAURANT SELECTED WITH THE LEGAL NUMBER OF THE EXPENSE DOCUMENT
+    const legalNumberResponse = checkExpenseAndRestLegalNumber(
+      Receptor,
+      restaurant
+    );
+    if (legalNumberResponse.error) {
+      throw new Error(legalNumberResponse.message);
+    }
+
+    //CHECK IF THE PROVIDER EXIST FOR THIS RESTAURANT IF NOT CREATED IT
+    const providerResponse = await createProviderOnDb(Emisor, restaurant, user);
+    if (providerResponse.error && !providerResponse.providerId) {
+      throw new Error(providerResponse.message);
+    }
+
+    //CREATE THE EXPENSE SUMMARY
+    const expenseSummaryResponse = await createExpenseSummaryOnDb(
+      ResumenFactura
+    );
+    if (expenseSummaryResponse.error && !expenseSummaryResponse.summaryId) {
+      throw new Error(expenseSummaryResponse.message);
+    }
+
+    //CREATE THE EXPENSE DOCUMENT AND RETURN THE ID
+    const expenseResponse = await createExpenseOnDb(
+      completeExpense,
+      restaurant,
+      user,
+      providerResponse.providerId as string,
+      expenseSummaryResponse.summaryId as string
+    );
+    if (expenseResponse.error && !expenseResponse.expenseId) {
+      throw new Error(expenseResponse.message);
+    }
+
+    //CREATE THE EXPENSE LINE DETAIL
+    const lineDetailResponse = await createExpenseLineDetailOnDb(
+      DetalleServicio.LineaDetalle,
+      expenseResponse.expenseId as string,
+      expenseSummaryResponse.summaryId as string
+    );
+    if (lineDetailResponse.error) {
+      throw new Error(lineDetailResponse.message);
+    }
+    return {
+      error: false,
+      message: "Create Successfully",
+      expenseId: expenseResponse.expenseId,
+    };
+  } catch (error: any) {
     return {
       error: true,
-      message:
-        "The XML does not have the 'Factura Electronica' information, Invalid XML format.",
+      message: error.message ? error.message : "Error creating the expense.",
+      expenseId: null,
     };
   }
-  const completeExpense = xmlToJson.FacturaElectronica;
-
-  if (!completeExpense?.Receptor) {
-    return {
-      error: true,
-      message:
-        "The XML does not have the 'Receptor' information, Invalid XML format.",
-    };
-  }
-  const Receptor = completeExpense.Receptor;
-
-  if (!completeExpense?.Emisor) {
-    return {
-      error: true,
-      message:
-        "The XML does not have the 'Emisor' information, Invalid XML format.",
-    };
-  }
-  const Emisor = completeExpense.Emisor;
-
-  if (!completeExpense?.ResumenFactura) {
-    return {
-      error: true,
-      message:
-        "The XML does not have the 'Resumen de Factura' information, Invalid XML format.",
-    };
-  }
-  const ResumenFactura = completeExpense.ResumenFactura;
-
-  if (!completeExpense?.DetalleServicio) {
-    return {
-      error: true,
-      message:
-        "The XML does not have the 'Detalle de Servicio' information, Invalid XML format.",
-    };
-  }
-  const DetalleServicio = completeExpense.DetalleServicio;
-
-  //MATCH LEGAL NUMBER OF THE RESTAURANT SELECTED WITH THE LEGAL NUMBER OF THE EXPENSE DOCUMENT
-  const legalNumberResponse = checkExpenseAndRestLegalNumber(
-    Receptor,
-    restaurant
-  );
-  if (legalNumberResponse.error) {
-    return { error: true, message: legalNumberResponse.message };
-  }
-
-  //CHECK IF THE PROVIDER EXIST FOR THIS RESTAURANT IF NOT CREATED IT
-  const providerResponse = await createProviderOnDb(Emisor, restaurant, user);
-  if (providerResponse.error && !providerResponse.providerId) {
-    return { error: true, message: providerResponse.message };
-  }
-
-   //CREATE THE EXPENSE SUMMARY
-   const expenseSummaryResponse = await createExpenseSummaryOnDb(ResumenFactura);
-   if (expenseSummaryResponse.error && !expenseSummaryResponse.summaryId) {
-     return { error: true, message: expenseSummaryResponse.message };
-   }
-
-  //CREATE THE EXPENSE DOCUMENT AND RETURN THE ID
-  const expenseResponse = await createExpenseOnDb(
-    completeExpense,
-    restaurant,
-    user,
-    providerResponse.providerId as string,
-    expenseSummaryResponse.summaryId as string
-  );
-  if (expenseResponse.error && !expenseResponse.expenseId) {
-    return { error: true, message: expenseResponse.message };
-  }
-
- 
-
-  //CREATE THE EXPENSE LINE DETAIL
-  const lineDetailResponse = await createExpenseLineDetailOnDb(
-    DetalleServicio.LineaDetalle,
-    expenseResponse.expenseId as string,
-    expenseSummaryResponse.summaryId as string
-  );
-  if (lineDetailResponse.error) {
-    return { error: true, message: lineDetailResponse.message };
-  }
-  return { error: false, message: "Create Successfully" };
 };
 
 const readXmlData = async (xmlData: string): Promise<any> => {
@@ -163,7 +166,6 @@ const checkExpenseAndRestLegalNumber = (
     message: "Legal number is valid.",
   };
 };
-
 
 const createProviderOnDb = async (
   provider: any,
@@ -230,10 +232,9 @@ const createProviderOnDb = async (
 
 type TCreateExpenseOnDb = {
   error: boolean;
-  message: string | null;
+  message: string;
   expenseId: string | null;
 };
-
 
 const createExpenseSummaryOnDb = async (summary: any) => {
   if (!summary)
@@ -327,11 +328,7 @@ const createExpenseOnDb = async (
   };
   const validation = ExpenseSchema.safeParse(newExpense);
   if (validation.error) {
-    return {
-      error: true,
-      message: "Error validating the expense",
-      expenseId: null,
-    };
+    throw new Error("Error validating the expense");
   }
 
   try {
@@ -341,18 +338,14 @@ const createExpenseOnDb = async (
       .filter({ clave: newExpense.clave })
       .getFirst();
     if (filterExpense)
-      return {
-        error: true,
-        message: "The expense 'CLAVE' is already on the system.",
-        expenseId: null,
-      };
+      throw new Error("The expense 'CLAVE' is already on the system.");
     const storedExpense = await xata.db.expenses.create(newExpense);
     return { error: false, message: null, expenseId: storedExpense.id };
-  } catch (error) {
+  } catch (error: any) {
     await removeExpenseOnErrorCase(null, summaryId);
     return {
       error: true,
-      message: "Error creating the expense.",
+      message: error.message ? error.message : "Error creating the expense.",
       expenseId: null,
     };
   }
@@ -364,14 +357,11 @@ const createExpenseLineDetailOnDb = async (
   summaryId: string
 ) => {
   try {
-
     if (!lineDetail)
-      return {
-        error: true,
-        message:
-          "The purchase XML does not provide the 'Line Detail' information.",
-      };
-  
+      throw new Error(
+        "The purchase XML does not provide the 'Line Detail' information."
+      );
+
     let groupOfLineDetail: IExpensesLineDetail[] = [];
     if (Array.isArray(lineDetail)) {
       lineDetail.forEach((line) => {
@@ -384,18 +374,23 @@ const createExpenseLineDetailOnDb = async (
           PrecioUnitario: line.PrecioUnitario ? Number(line.PrecioUnitario) : 0,
           MontoTotal: line.MontoTotal ? Number(line.MontoTotal) : 0,
           SubTotal: line.SubTotal ? Number(line.SubTotal) : 0,
-          ImpuestoTarifa: line.Impuesto?.Tarifa ? Number(line.Impuesto.Tarifa) : 0,
+          ImpuestoTarifa: line.Impuesto?.Tarifa
+            ? Number(line.Impuesto.Tarifa)
+            : 0,
           ImpuestoMonto: line.Impuesto?.Monto ? Number(line.Impuesto.Monto) : 0,
           ImpuestoNeto: line.Impuesto?.Neto ? Number(line.Impuesto.Neto) : 0,
           MontoTotalLinea: line.MontoTotalLinea
             ? Number(line.MontoTotalLinea)
             : 0,
+          Cantidad: Number(line.Cantidad) || 0,
         });
       });
     } else {
       groupOfLineDetail.push({
         expense: expenseId,
-        NumeroLinea: lineDetail.NumeroLinea ? Number(lineDetail.NumeroLinea) : 0,
+        NumeroLinea: lineDetail.NumeroLinea
+          ? Number(lineDetail.NumeroLinea)
+          : 0,
         Codigo: lineDetail.Codigo ? lineDetail.Codigo : "",
         UnidadMedida: lineDetail.UnidadMedida ? lineDetail.UnidadMedida : "",
         Detalle: lineDetail.Detalle ? lineDetail.Detalle : "",
@@ -416,22 +411,18 @@ const createExpenseLineDetailOnDb = async (
         MontoTotalLinea: lineDetail.MontoTotalLinea
           ? Number(lineDetail.MontoTotalLinea)
           : 0,
+        Cantidad: Number(lineDetail.Cantidad) || 0,
       });
     }
-  
+
     if (groupOfLineDetail.length === 0) {
-      return {
-        error: false,
-        message: "Any line detail to create",
-      };
+      throw new Error("Any line detail to create");
     }
-  
-    const validation = GroupExpenseLineDetailSchema.safeParse(groupOfLineDetail);
+
+    const validation =
+      GroupExpenseLineDetailSchema.safeParse(groupOfLineDetail);
     if (validation.error) {
-      return {
-        error: true,
-        message: "Error validating the expense line detail",
-      };
+      throw new Error("Error validating the expense line detail");
     }
 
     const xata = getXataClient();
@@ -441,36 +432,38 @@ const createExpenseLineDetailOnDb = async (
       error: false,
       message: "New expense line detail created.",
     };
-  } catch (error) {
+  } catch (error: any) {
     await removeExpenseOnErrorCase(expenseId, summaryId);
     return {
       error: true,
-      message: "Error creating the expense line detail.",
+      message: error.message ? error.message : "Error creating the expense.",
     };
   }
 };
 
-const removeExpenseOnErrorCase = async (expenseId: string | null, summaryId: string) => {
+const removeExpenseOnErrorCase = async (
+  expenseId: string | null,
+  summaryId: string
+) => {
   const xata = getXataClient();
 
-  if(expenseId){
+  if (expenseId) {
     try {
       await xata.sql`DELETE FROM "expenses_line_detail" WHERE expense=${expenseId}`;
     } catch (error) {
-      console.log('Error removing line detail');
+      console.log("Error removing line detail");
     }
-  
+
     try {
       await xata.db.expenses.delete(expenseId);
     } catch (error) {
-      console.log('Error removing expense');
+      console.log("Error removing expense");
     }
   }
 
   try {
     await xata.db.expenses_summary.delete(summaryId);
   } catch (error) {
-    console.log('Error removing summary');
+    console.log("Error removing summary");
   }
 };
-

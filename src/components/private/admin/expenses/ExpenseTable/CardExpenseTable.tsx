@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -25,6 +19,8 @@ import {
 
 import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
+import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
+import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 
 const CardExpenseTable = () => {
   const searchParams = useSearchParams();
@@ -36,11 +32,13 @@ const CardExpenseTable = () => {
   const endDate = checkUnixStringDateIsValid(searchParams.get("endDate"))
     ? Number(searchParams.get("endDate"))
     : dates.end;
+  const invoiceKey = searchParams.get("invoiceKey") || null;
+  const expenseId = searchParams.get("expenseId") || null;
 
   const expenseFilter: IExpenseFilter = {
     startDate: startDate,
     endDate: endDate,
-    invoiceKey: searchParams.get("invoiceKey") || null,
+    invoiceKey: invoiceKey,
   };
 
   const { data: expenses, isLoading } = useQuery<string | null>({
@@ -50,26 +48,28 @@ const CardExpenseTable = () => {
       expenseFilter.endDate,
       String(expenseFilter.invoiceKey),
     ],
-    queryFn: async () => await getAllExpenses(expenseFilter)
+    queryFn: async () => await getAllExpenses(expenseFilter),
   });
 
-  //TODO: CREATE A LOCADING SKELLETON COMPONENT FOR THIS
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <SkeletonTable />;
 
-  //TODO: CREATE A EMPTY COMPONENT FOR THIS
-  if (!expenses || expenses.length === 0)
-    return <div>No hay gastos registrados</div>;
+  if (!expenses) {
+    return <SharedCenterMessage message="Sin Resultados" />;
+  }
 
   const expensesData = JSON.parse(expenses) as IGroupExpenseTable[];
 
+  if (!expensesData || expensesData.length === 0) {
+    return <SharedCenterMessage message="Sin Resultados" />;
+  }
+
   return (
-    <Card x-chunk="dashboard-05-chunk-3">
+    <Card>
       <CardContent>
-        <Table>
+        <Table className="z-0">
           <TableHeader>
             <TableRow>
-              <TableHead>Gasto</TableHead>
-              <TableHead className="hidden sm:table-cell">Tipo</TableHead>
+              <TableHead>Proveedor</TableHead>
               <TableHead className="hidden sm:table-cell">Estado</TableHead>
               <TableHead className="hidden md:table-cell">Fecha</TableHead>
               <TableHead className="table-cell">Monto</TableHead>
@@ -77,7 +77,11 @@ const CardExpenseTable = () => {
           </TableHeader>
           <TableBody>
             {expensesData.map((expense, index) => (
-              <CardExpenseTableRow key={index} expense={expense} />
+              <CardExpenseTableRow
+                key={index}
+                expense={expense}
+                expenseId={expenseId}
+              />
             ))}
           </TableBody>
         </Table>
