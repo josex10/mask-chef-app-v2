@@ -340,7 +340,7 @@ const createExpenseOnDb = async (
     if (filterExpense)
       throw new Error("The expense 'CLAVE' is already on the system.");
     const storedExpense = await xata.db.expenses.create(newExpense);
-    return { error: false, message: null, expenseId: storedExpense.id };
+    return { error: false, message: "Success Process", expenseId: storedExpense.id };
   } catch (error: any) {
     await removeExpenseOnErrorCase(null, summaryId);
     return {
