@@ -15,23 +15,22 @@ import {
 import {
   checkIfUnixDateIsValid,
   converDateToUnix,
+  convertUnixToDate,
 } from "@/utils/helpers/dates";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { getStartAndEndDateBasedOnDateString } from "@/utils/helpers/expenses";
+import { usePathname, useRouter } from "next/navigation";
+import { getExpensesQueryParams } from "@/utils/helpers/expenses";
 
 export function ExpenseDateRangeFilter({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const router = useRouter();
   const pathName = usePathname();
-  const searchParams = useSearchParams();
-  const expenseId = searchParams.get("expenseId");
 
-  const { startDate, endDate } = getStartAndEndDateBasedOnDateString(searchParams.get("startDate"), searchParams.get("endDate"));
+  const { startDate: startDateUnix, endDate: endDateUnix, expenseId } = getExpensesQueryParams();
 
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: startDate,
-    to: endDate,
+    from: convertUnixToDate(startDateUnix),
+    to: convertUnixToDate(endDateUnix),
   });
 
   return (

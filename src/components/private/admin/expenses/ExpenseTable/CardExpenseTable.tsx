@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -11,44 +12,20 @@ import {
 import CardExpenseTableRow from "./CardExpenseTableRow";
 import { getAllExpenses } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import {
-  checkUnixStringDateIsValid,
-  getTodayOnUnixTime,
-} from "@/utils/helpers/dates";
 
-import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
+import ExpenseTablePagination from "./ExpenseTablePagination";
+import { getExpensesQueryParams } from "@/utils/helpers/expenses";
 
 const CardExpenseTable = () => {
-  const searchParams = useSearchParams();
-  const dates = getTodayOnUnixTime();
-
-  const startDate = checkUnixStringDateIsValid(searchParams.get("startDate"))
-    ? Number(searchParams.get("startDate"))
-    : dates.start;
-  const endDate = checkUnixStringDateIsValid(searchParams.get("endDate"))
-    ? Number(searchParams.get("endDate"))
-    : dates.end;
-  const invoiceKey = searchParams.get("invoiceKey") || null;
-  const expenseId = searchParams.get("expenseId") || null;
-
-  const expenseFilter: IExpenseFilter = {
-    startDate: startDate,
-    endDate: endDate,
-    invoiceKey: invoiceKey,
-  };
+  const { startDate, endDate, expenseId } = getExpensesQueryParams();
 
   const { data: expenses, isLoading } = useQuery<string | null>({
-    queryKey: [
-      "expensesTable",
-      expenseFilter.startDate,
-      expenseFilter.endDate,
-      String(expenseFilter.invoiceKey),
-    ],
-    queryFn: async () => await getAllExpenses(expenseFilter),
+    queryKey: ["expensesTable", startDate, endDate],
+    queryFn: async () =>
+      await getAllExpenses({ startDate, endDate, expenseId }),
   });
 
   if (isLoading) return <SkeletonTable />;
@@ -80,10 +57,12 @@ const CardExpenseTable = () => {
               <CardExpenseTableRow
                 key={index}
                 expense={expense}
-                expenseId={expenseId}
               />
             ))}
           </TableBody>
+          {/* <TableFooter>
+            <ExpenseTablePagination />
+          </TableFooter> */}
         </Table>
       </CardContent>
     </Card>

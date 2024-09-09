@@ -14,22 +14,32 @@ import { getExpensesSummary } from "@/lib/actions/private/admin/expenses/GetExpe
 import { useQuery } from "@tanstack/react-query";
 import useStoreAuth from "@/store/private/admin/auth";
 import CardExpenseFinatialInfoSkeleton from "./Skeletons/CardExpenseFinatialInfoSkeleton";
-import { useSearchParams } from "next/navigation";
-import { getStartAndEndDateBasedOnDateString } from "@/utils/helpers/expenses";
-import { converDateToUnix } from "@/utils/helpers/dates";
+import {
+  getExpensesQueryParams,
+  getStartAndEndDateBasedOnDateString,
+} from "@/utils/helpers/expenses";
+import {convertUnixToDate } from "@/utils/helpers/dates";
 
 type TCardExpenseFinatialInfoProps = {
   content: string;
 };
 
-const CardExpenseFinatialInfo = ({content}: TCardExpenseFinatialInfoProps) => {
-  const searchParams = useSearchParams();
+const CardExpenseFinatialInfo = ({
+  content,
+}: TCardExpenseFinatialInfoProps) => {
   const rest = useStoreAuth((state) => state.selectedRestaurant);
-  const { startDate, endDate } = getStartAndEndDateBasedOnDateString(searchParams.get("startDate"), searchParams.get("endDate"));
+  const { startDate: startDateUnix, endDate: endDateUnix } =
+    getExpensesQueryParams();
 
-  const {data, isLoading} = useQuery<number>({
-    queryKey: [`expensesFinantialInfo`, converDateToUnix(startDate), converDateToUnix(endDate)],
-    queryFn: async () => getExpensesSummary(rest?.id, startDate, endDate),
+  //convertUnixToDate
+  const { data, isLoading } = useQuery<number>({
+    queryKey: [`expensesFinantialInfo`, startDateUnix, endDateUnix],
+    queryFn: async () =>
+      getExpensesSummary(
+        rest?.id,
+        convertUnixToDate(startDateUnix),
+        convertUnixToDate(endDateUnix)
+      ),
   });
 
   //TODO: get filter from state, its not implemented yet

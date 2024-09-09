@@ -57,4 +57,29 @@ export const checkUnixStringDateIsValid = (date: string | null) => {
 
 export const converDateToUnix = (date: Date) => {
     return getUnixTime(date);
-}
+};
+
+
+export const convertAnyTypeToDateUnix = (date: any): number => {
+
+    if(date === null || date === undefined) return getUnixTime(new Date());
+
+    if(isValid(new Date(date))){
+        return getUnixTime(new Date(date));
+    }
+
+    if(isValid(new Date(fromUnixTime(date)))){
+        return date;
+    }
+
+    return getUnixTime(new Date());
+};
+
+export const getStartDateOfDateUnix = (unix: number) => {
+    const date = fromUnixTime(unix);
+    return getUnixTime(startOfDay(date));
+};
+export const getEndDateOfDateUnix = (unix: number) => {
+    const date = fromUnixTime(unix);
+    return getUnixTime(endOfDay(date));
+};

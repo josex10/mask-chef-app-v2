@@ -8,13 +8,13 @@ import {
 } from "@/utils/helpers/dates";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
-import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
+import { IExpenseQueryParams } from "@/utils/interfaces/private/admin/expenseQueryParams";
 import { getXataClient } from "@/xata";
 
 const xata = getXataClient();
 
 export const getAllExpenses = async (
-  filter: IExpenseFilter,
+  filter: IExpenseQueryParams,
   offset: number = 0
 ): Promise<string | null> => {
   try {
