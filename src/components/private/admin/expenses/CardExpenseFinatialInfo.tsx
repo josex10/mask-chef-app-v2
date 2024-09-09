@@ -14,11 +14,8 @@ import { getExpensesSummary } from "@/lib/actions/private/admin/expenses/GetExpe
 import { useQuery } from "@tanstack/react-query";
 import useStoreAuth from "@/store/private/admin/auth";
 import CardExpenseFinatialInfoSkeleton from "./Skeletons/CardExpenseFinatialInfoSkeleton";
-import {
-  getExpensesQueryParams,
-  getStartAndEndDateBasedOnDateString,
-} from "@/utils/helpers/expenses";
-import {convertUnixToDate } from "@/utils/helpers/dates";
+import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import { convertUnixToDate } from "@/utils/helpers/dates";
 
 type TCardExpenseFinatialInfoProps = {
   content: string;
@@ -29,9 +26,8 @@ const CardExpenseFinatialInfo = ({
 }: TCardExpenseFinatialInfoProps) => {
   const rest = useStoreAuth((state) => state.selectedRestaurant);
   const { startDate: startDateUnix, endDate: endDateUnix } =
-    getExpensesQueryParams();
+    useGetExpensesQueryParams();
 
-  //convertUnixToDate
   const { data, isLoading } = useQuery<number>({
     queryKey: [`expensesFinantialInfo`, startDateUnix, endDateUnix],
     queryFn: async () =>

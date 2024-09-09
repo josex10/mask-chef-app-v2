@@ -18,7 +18,7 @@ import {
   convertUnixToDate,
 } from "@/utils/helpers/dates";
 import { usePathname, useRouter } from "next/navigation";
-import { getExpensesQueryParams } from "@/utils/helpers/expenses";
+import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 
 export function ExpenseDateRangeFilter({
   className,
@@ -26,7 +26,7 @@ export function ExpenseDateRangeFilter({
   const router = useRouter();
   const pathName = usePathname();
 
-  const { startDate: startDateUnix, endDate: endDateUnix, expenseId } = getExpensesQueryParams();
+  const { startDate: startDateUnix, endDate: endDateUnix, expenseId } = useGetExpensesQueryParams();
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: convertUnixToDate(startDateUnix),

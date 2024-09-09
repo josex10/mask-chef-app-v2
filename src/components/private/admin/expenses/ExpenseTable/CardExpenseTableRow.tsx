@@ -4,7 +4,7 @@ import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { convertDateToStandard } from "@/utils/helpers/dates";
-import { cutExpenseClave, getExpensesQueryParams } from "@/utils/helpers/expenses";
+import { cutExpenseClave, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -15,7 +15,7 @@ type TCardExpenseProp = {
 const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const router = useRouter();
   const pathName = usePathname();
-  const { startDate, endDate, expenseId } = getExpensesQueryParams();
+  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
 
 
   const handleOnClick = () => {

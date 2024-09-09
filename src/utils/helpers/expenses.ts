@@ -20,31 +20,10 @@ export const cutExpenseClave = (clave: string) => {
   return clave;
 };
 
-export const getStartAndEndDateBasedOnDateString = (
-  startDate: string | null,
-  endDate: string | null
-) => {
-  const dates = getFilterDates(EFilters.day);
-
-  return {
-    startDate: !startDate
-      ? dates.start
-      : checkUnixStringDateIsValid(startDate)
-      ? convertUnixToDate(Number(startDate))
-      : dates.start,
-    endDate: !endDate
-      ? dates.end
-      : checkUnixStringDateIsValid(endDate)
-      ? convertUnixToDate(Number(endDate))
-      : dates.end,
-  };
-};
-
-
 
 
 /**
- * @name getExpensesQueryParams
+ * @name useGetExpensesQueryParams
  * @category Expenses Helpers
  * @summary Get the query params for the expenses page
  *
@@ -58,7 +37,7 @@ export const getStartAndEndDateBasedOnDateString = (
  * const params = getExpensesQueryParams()
  * //=> { startDate: 1722492000, endDate: 1725947999, expenseId: rec_crfh32hrougubj4utrug }
  */
-export const getExpensesQueryParams = (): IExpenseQueryParams => {
+export const useGetExpensesQueryParams = (): IExpenseQueryParams => {
   const searchParams = useSearchParams();
   const startDate = convertAnyTypeToDateUnix(searchParams.get(EExpenseQueryParams.startDate));
   const endDate = convertAnyTypeToDateUnix(searchParams.get(EExpenseQueryParams.endDate));

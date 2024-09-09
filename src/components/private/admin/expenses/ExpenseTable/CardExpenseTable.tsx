@@ -17,10 +17,10 @@ import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroup
 import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import ExpenseTablePagination from "./ExpenseTablePagination";
-import { getExpensesQueryParams } from "@/utils/helpers/expenses";
+import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 
 const CardExpenseTable = () => {
-  const { startDate, endDate, expenseId } = getExpensesQueryParams();
+  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
 
   const { data: expenses, isLoading } = useQuery<string | null>({
     queryKey: ["expensesTable", startDate, endDate],
