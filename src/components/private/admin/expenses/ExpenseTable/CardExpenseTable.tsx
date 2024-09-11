@@ -17,13 +17,13 @@ import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroup
 import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import ExpenseTablePagination from "./ExpenseTablePagination";
-import { getExpenseTableQueryClientKey, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import { useGetExpenseTableQueryClientKey, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 
 const CardExpenseTable = () => {
   const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
 
   const { data: expenses, isLoading } = useQuery<string | null>({
-    queryKey: getExpenseTableQueryClientKey(),
+    queryKey: useGetExpenseTableQueryClientKey({ startDate, endDate, expenseId }),
     queryFn: async () =>
       await getAllExpenses({ startDate, endDate, expenseId }),
   });

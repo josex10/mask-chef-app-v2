@@ -41,8 +41,8 @@ import { useState } from "react";
 import { addExpensePayment } from "@/lib/actions/private/admin/expenses/AddExpensePayment";
 import toast from "react-hot-toast";
 import {
-  getExpenseTableQueryClientKey,
-  getSingleExpenseQueryClientKey,
+  useGetExpenseTableQueryClientKey,
+  useGetSingleExpenseQueryClientKey,
   useGetExpensesQueryParams,
 } from "@/utils/helpers/expenses";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -58,13 +58,14 @@ const test = async () => {
 export function DialogExpensePayment() {
   const queryClient = useQueryClient();
   const rest = useStoreAuth((state) => state.selectedRestaurant);
-  const singleExpenseKey = getSingleExpenseQueryClientKey();
-  const tableExpenseKey = getExpenseTableQueryClientKey();
+  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
+  const singleExpenseKey = useGetSingleExpenseQueryClientKey({ startDate, endDate, expenseId } );
+  const tableExpenseKey = useGetExpenseTableQueryClientKey({ startDate, endDate, expenseId } );
   const { data, isLoading } = useQuery<string | null>({
     queryKey: ["expensePaymentType"],
     queryFn: async () => await getExpensesPaymentType(rest?.id),
   });
-  const { expenseId } = useGetExpensesQueryParams();
+  
 
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);

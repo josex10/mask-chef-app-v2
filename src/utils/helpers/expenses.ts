@@ -49,13 +49,11 @@ export const useGetExpensesQueryParams = (): IExpenseQueryParams => {
 };
 
 
-export const getExpenseTableQueryClientKey = ():any[] =>{
-  const { startDate, endDate } = useGetExpensesQueryParams();
-  return [EQueryClientsKeys.expensesTable, startDate, endDate];
+export const useGetExpenseTableQueryClientKey = (data: IExpenseQueryParams):any[] =>{
+  return [EQueryClientsKeys.expensesTable, data.startDate, data.endDate];
 };
 
-export const getSingleExpenseQueryClientKey = ():any[] =>{
-  const { expenseId } = useGetExpensesQueryParams();
-  return [EQueryClientsKeys.singleExpense, expenseId];
+export const useGetSingleExpenseQueryClientKey = (data: IExpenseQueryParams):any[] =>{
+  return [EQueryClientsKeys.singleExpense, data.expenseId];
 };
 
