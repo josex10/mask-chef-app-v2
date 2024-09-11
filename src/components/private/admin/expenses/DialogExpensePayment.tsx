@@ -130,7 +130,6 @@ export function DialogExpensePayment() {
       setIsLoading(false);
       setOpen(false);
     } catch (error) {
-      console.log(error);
       toast.error("Ocurrió un error al realizar la acción");
       setIsLoading(false);
     }
