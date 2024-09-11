@@ -3,7 +3,7 @@
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { convertDateToStandard } from "@/utils/helpers/dates";
+import { checkIfDateIsAfterToday, checkIfDateIsBeforeToday, convertDateToStandard } from "@/utils/helpers/dates";
 import { cutExpenseClave, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -32,6 +32,8 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const selectedClass =
     expenseId && expense.id === expenseId ? "bg-muted/40" : "";
 
+  const isOverdue = checkIfDateIsBeforeToday(expense.paymentExpirationDate);
+
   return (
     <TableRow onClick={handleOnClick} className={selectedClass}>
       <TableCell>
@@ -41,9 +43,15 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
         </div>
       </TableCell>
       <TableCell className="hidden sm:table-cell">
-        <Badge className="text-xs" variant="secondary">
-          Cancelado
-        </Badge>
+        {expense.isPaid ? (
+          <Badge className="text-xs" variant="default">
+            Pagado
+          </Badge>
+        ) : (
+          <Badge className="text-xs" variant={isOverdue ? 'destructive' : 'outline'}>
+            Pendiente
+          </Badge>
+        )}
       </TableCell>
       <TableCell className="hidden sm:table-cell">
         {convertDateToStandard(String(expense.fechaEmision))}

@@ -1,4 +1,4 @@
-import { endOfMonth, endOfWeek, startOfMonth, startOfWeek, format, isDate, startOfDay, endOfDay, getUnixTime, parse, isValid, fromUnixTime } from 'date-fns';
+import { endOfMonth, endOfWeek, startOfMonth, startOfWeek, format, isDate, startOfDay, endOfDay, getUnixTime, parse, isValid, fromUnixTime, isAfter, isBefore } from 'date-fns';
 import { EFilters } from "../enums/filters";
 
 export const getStardAndEndDateOfTheWeek = (date: Date) => {
@@ -79,7 +79,18 @@ export const getStartDateOfDateUnix = (unix: number) => {
     const date = fromUnixTime(unix);
     return getUnixTime(startOfDay(date));
 };
+
 export const getEndDateOfDateUnix = (unix: number) => {
     const date = fromUnixTime(unix);
     return getUnixTime(endOfDay(date));
+};
+
+export const checkIfDateIsAfterToday = (date: Date) => {
+    const {end} = getStardAndEndDateOfTheDay(new Date());
+    return isAfter(date, end);
+};
+
+export const checkIfDateIsBeforeToday = (date: Date) => {
+    const {start} = getStardAndEndDateOfTheDay(new Date());
+    return isBefore(date, start);
 };

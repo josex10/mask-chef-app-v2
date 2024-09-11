@@ -31,6 +31,7 @@ const tables = [
       { column: "id_restaurant", table: "users_x_restaurants" },
       { column: "restaurant", table: "expenses" },
       { column: "restaurant", table: "providers" },
+      { column: "restaurant", table: "expenses_payment_type" },
     ],
   },
   {
@@ -127,10 +128,18 @@ const tables = [
         link: { table: "expenses_summary" },
         unique: true,
       },
+      { name: "isPaid", type: "bool", notNull: true, defaultValue: "false" },
+      {
+        name: "paymentExpirationDate",
+        type: "datetime",
+        notNull: true,
+        defaultValue: "now",
+      },
     ],
     revLinks: [
       { column: "expense", table: "expenses_line_detail" },
       { column: "expense", table: "expenses_summary" },
+      { column: "expense", table: "expenses_payment_detail" },
     ],
   },
   {
@@ -313,6 +322,33 @@ const tables = [
       { name: "Cantidad", type: "float", notNull: true, defaultValue: "1" },
     ],
   },
+  {
+    name: "expenses_payment_detail",
+    columns: [
+      { name: "expense", type: "link", link: { table: "expenses" } },
+      {
+        name: "payment_type",
+        type: "link",
+        link: { table: "expenses_payment_type" },
+      },
+      { name: "referenceNumber", type: "text", defaultValue: "" },
+      { name: "notes", type: "text" },
+    ],
+  },
+  {
+    name: "expenses_payment_type",
+    columns: [
+      {
+        name: "type",
+        type: "text",
+        notNull: true,
+        defaultValue: "SYSTEM_TYPE",
+      },
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+      { name: "description", type: "text" },
+    ],
+    revLinks: [{ column: "payment_type", table: "expenses_payment_detail" }],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -345,6 +381,12 @@ export type ExpensesSummaryRecord = ExpensesSummary & XataRecord;
 export type ExpensesLineDetail = InferredTypes["expenses_line_detail"];
 export type ExpensesLineDetailRecord = ExpensesLineDetail & XataRecord;
 
+export type ExpensesPaymentDetail = InferredTypes["expenses_payment_detail"];
+export type ExpensesPaymentDetailRecord = ExpensesPaymentDetail & XataRecord;
+
+export type ExpensesPaymentType = InferredTypes["expenses_payment_type"];
+export type ExpensesPaymentTypeRecord = ExpensesPaymentType & XataRecord;
+
 export type DatabaseSchema = {
   restaurants: RestaurantsRecord;
   countries: CountriesRecord;
@@ -355,6 +397,8 @@ export type DatabaseSchema = {
   providers: ProvidersRecord;
   expenses_summary: ExpensesSummaryRecord;
   expenses_line_detail: ExpensesLineDetailRecord;
+  expenses_payment_detail: ExpensesPaymentDetailRecord;
+  expenses_payment_type: ExpensesPaymentTypeRecord;
 };
 
 const DatabaseClient = buildClient();

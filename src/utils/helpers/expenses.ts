@@ -1,16 +1,14 @@
+'use client';
+
 import { useSearchParams } from "next/navigation";
-import { EFilters } from "../enums/filters";
-import { IExpense } from '../interfaces/private/admin/expenses';
 import {
-  checkUnixStringDateIsValid,
   convertAnyTypeToDateUnix,
-  convertUnixToDate,
   getEndDateOfDateUnix,
-  getFilterDates,
   getStartDateOfDateUnix,
 } from "./dates";
 import { EExpenseQueryParams } from "../enums/expenseQueryParams";
 import { IExpenseQueryParams } from "../interfaces/private/admin/expenseQueryParams";
+import { EQueryClientsKeys } from "../enums/queryClientKeys";
 
 export const cutExpenseClave = (clave: string) => {
   if (!clave) return "N/A";
@@ -48,5 +46,16 @@ export const useGetExpensesQueryParams = (): IExpenseQueryParams => {
     endDate: getEndDateOfDateUnix(endDate),
     expenseId: expenseId,
   };
+};
+
+
+export const getExpenseTableQueryClientKey = ():any[] =>{
+  const { startDate, endDate } = useGetExpensesQueryParams();
+  return [EQueryClientsKeys.expensesTable, startDate, endDate];
+};
+
+export const getSingleExpenseQueryClientKey = ():any[] =>{
+  const { expenseId } = useGetExpensesQueryParams();
+  return [EQueryClientsKeys.singleExpense, expenseId];
 };
 
