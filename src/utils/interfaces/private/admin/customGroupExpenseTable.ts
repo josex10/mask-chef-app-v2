@@ -3,5 +3,7 @@ export interface IGroupExpenseTable {
     clave: string;
     fechaEmision: Date;
     providerName: string;
+    paymentExpirationDate: Date;
+    isPaid: boolean;
     totalComprobante: number;
   }

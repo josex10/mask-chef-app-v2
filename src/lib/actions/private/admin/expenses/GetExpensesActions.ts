@@ -36,6 +36,8 @@ export const getAllExpenses = async (
         "clave",
         "fechaEmision",
         "provider.name",
+        "paymentExpirationDate",
+        "isPaid",
         "expenseSummary.TotalComprobante",
       ])
       .filter({
@@ -59,6 +61,8 @@ export const getAllExpenses = async (
         clave: expense.clave,
         fechaEmision: expense.fechaEmision,
         providerName: expense.provider?.name || "",
+        paymentExpirationDate: expense.paymentExpirationDate,
+        isPaid: expense.isPaid,
         totalComprobante: expense.expenseSummary?.TotalComprobante || 0,
       };
     });
@@ -88,6 +92,7 @@ export const getSingleExpense = async (
         "provider.phone",
         "provider.email",
         "provider.comercialName",
+        "isPaid",
         "xata.createdAt",
       ])
       .filter({
@@ -103,6 +108,14 @@ export const getSingleExpense = async (
         expense: expenseId,
       })
       .getAll();
+
+    const expensePaymentDetails = await xata.db.expenses_payment_detail
+      .select(["id", "payment_type.type", "referenceNumber","notes", "xata.createdAt"])
+      .filter({
+        expense: expenseId,
+      })
+      .getFirst();
+    
 
     const result: ICustomSingleExpense = {
       id: expense.id,
@@ -130,6 +143,14 @@ export const getSingleExpense = async (
           SubTotal: detail.SubTotal,
         };
       }),
+      isPaid: expense.isPaid,
+      paymentDetail: (!expensePaymentDetails)? null : {
+        id: expensePaymentDetails.id || "",
+        paymentTypeType: expensePaymentDetails.payment_type?.type || "",
+        referenceNumber: expensePaymentDetails.referenceNumber || "",
+        notes: expensePaymentDetails.notes || "",
+        createdAt: expensePaymentDetails.xata.createdAt,
+      }
     };
     return result ? JSON.stringify(result) : null;
   } catch (error) {

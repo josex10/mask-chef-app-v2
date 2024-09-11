@@ -1,4 +1,5 @@
 import { ICustomSingleExpenseLineDetail } from "./customSingleExpenseLineDetail";
+import { ICustomSingleExpensePaymentDetail } from "./customSingleExpensePaymentDetail";
 
 export interface ICustomSingleExpense{
     id: string;
@@ -16,4 +17,6 @@ export interface ICustomSingleExpense{
     providerComercialName: string | null;
     xataCreatedAt: Date;
     lineDetails: ICustomSingleExpenseLineDetail[];
+    isPaid: boolean;
+    paymentDetail: ICustomSingleExpensePaymentDetail | null;
 }
