@@ -24,4 +24,9 @@ export const ExpensePaymentDetailSchema = z.object({
       .max(100, { message: `${EMessages.inputErrorMaxString} 50` })
       .optional()
       .or(z.literal("")),
+    payedBy: z
+      .string({ message: EMessages.inputErrorTypeString })
+      .trim()
+      .min(1, { message: EMessages.inputErrorRequired })
+      .max(100, { message: `${EMessages.inputErrorMaxString} 100` }),
   });

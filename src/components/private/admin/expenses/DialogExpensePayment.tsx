@@ -51,6 +51,7 @@ import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverAc
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
+import { ICustomSingleExpensePaymentDetail } from "@/utils/interfaces/private/admin/customSingleExpensePaymentDetail";
 
 const test = async () => {
   return await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -59,14 +60,22 @@ const test = async () => {
 export function DialogExpensePayment() {
   const queryClient = useQueryClient();
   const rest = useStoreAuth((state) => state.selectedRestaurant);
+  const userLogged = useStoreAuth((state) => state.user);
   const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
-  const singleExpenseKey = useGetSingleExpenseQueryClientKey({ startDate, endDate, expenseId } );
-  const tableExpenseKey = useGetExpenseTableQueryClientKey({ startDate, endDate, expenseId } );
+  const singleExpenseKey = useGetSingleExpenseQueryClientKey({
+    startDate,
+    endDate,
+    expenseId,
+  });
+  const tableExpenseKey = useGetExpenseTableQueryClientKey({
+    startDate,
+    endDate,
+    expenseId,
+  });
   const { data, isLoading } = useQuery<string | null>({
     queryKey: [EQueryClientsKeys.expensePaymentType, rest?.id],
     queryFn: async () => await getExpensesPaymentType(rest?.id),
   });
-  
 
   const [open, setOpen] = useState(false);
   const [loading, setIsLoading] = useState(false);
@@ -78,6 +87,7 @@ export function DialogExpensePayment() {
       payment_type: "",
       referenceNumber: "",
       notes: "",
+      payedBy: userLogged?.id || "",
     },
   });
 
@@ -97,8 +107,9 @@ export function DialogExpensePayment() {
       }
 
       const response = await addExpensePayment(data);
-      const { error, message } = JSON.parse(response) as IServerActionResponse;
+      const { error, message, data: responseData } = JSON.parse(response) as IServerActionResponse;
 
+    
       if (error) {
         toast.error(message);
         setIsLoading(false);
@@ -106,7 +117,9 @@ export function DialogExpensePayment() {
       }
 
       const cacheExpense = JSON.parse(cacheData) as ICustomSingleExpense;
+      const newPaymentDetail = responseData as ICustomSingleExpensePaymentDetail;
       cacheExpense.isPaid = true;
+      cacheExpense.paymentDetail = newPaymentDetail;
       const newCacheData = JSON.stringify(cacheExpense);
       queryClient.setQueryData<string | null>(singleExpenseKey, () => {
         return newCacheData;

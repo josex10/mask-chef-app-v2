@@ -111,7 +111,7 @@ export const getSingleExpense = async (
       .getAll();
 
     const expensePaymentDetails = await xata.db.expenses_payment_detail
-      .select(["id", "payment_type.type", "referenceNumber","notes", "xata.createdAt"])
+      .select(["id", "payment_type.type", "referenceNumber","notes", "payedBy.email", "xata.createdAt"])
       .filter({
         expense: expenseId,
       })
@@ -152,6 +152,7 @@ export const getSingleExpense = async (
         referenceNumber: expensePaymentDetails.referenceNumber || "",
         notes: expensePaymentDetails.notes || "",
         createdAt: expensePaymentDetails.xata.createdAt,
+        payedBy: expensePaymentDetails.payedBy?.email || "",
       }
     };
     return result ? JSON.stringify(result) : null;

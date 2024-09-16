@@ -90,6 +90,7 @@ const tables = [
       { column: "id_user", table: "users_x_restaurants" },
       { column: "createdBy", table: "expenses" },
       { column: "createdBy", table: "providers" },
+      { column: "payedBy", table: "expenses_payment_detail" },
     ],
   },
   {
@@ -319,6 +320,7 @@ const tables = [
       },
       { name: "referenceNumber", type: "text", defaultValue: "" },
       { name: "notes", type: "text" },
+      { name: "payedBy", type: "link", link: { table: "users" } },
     ],
   },
   {

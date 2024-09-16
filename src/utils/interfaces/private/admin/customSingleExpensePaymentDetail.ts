@@ -4,4 +4,5 @@ export interface ICustomSingleExpensePaymentDetail {
     referenceNumber:string;
     notes: string; 
     createdAt: Date;
+    payedBy: string;
 };
