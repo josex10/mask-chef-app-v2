@@ -7,6 +7,7 @@ export interface ICustomSingleExpense{
     fechaEmision: Date;
     numeroConsecutivo: string;
     createdByEmail: string | null;
+    expenseSummaryId: string;
     expenseSummaryTotalVenta: number;
     expenseSummaryTotalDescuentos: number;
     expenseSummaryTotalImpuesto: number;

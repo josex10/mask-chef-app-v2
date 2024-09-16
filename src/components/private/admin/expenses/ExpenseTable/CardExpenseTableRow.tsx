@@ -17,6 +17,8 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const pathName = usePathname();
   const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
 
+  if(!expense) return ;
+
 
   const handleOnClick = () => {
     if (startDate || endDate) {

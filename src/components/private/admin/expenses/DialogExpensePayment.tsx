@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ExpensePaymentDetailSchema } from "@/utils/schemas/private/ExpensePaymentDetailSchema";
 import { getExpensesPaymentType } from "@/lib/actions/private/admin/expenses/GetExpensesPaymentType";
 import useStoreAuth from "@/store/private/admin/auth";
@@ -50,6 +50,7 @@ import { cn } from "@/lib/utils";
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
+import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 
 const test = async () => {
   return await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -62,7 +63,7 @@ export function DialogExpensePayment() {
   const singleExpenseKey = useGetSingleExpenseQueryClientKey({ startDate, endDate, expenseId } );
   const tableExpenseKey = useGetExpenseTableQueryClientKey({ startDate, endDate, expenseId } );
   const { data, isLoading } = useQuery<string | null>({
-    queryKey: ["expensePaymentType"],
+    queryKey: [EQueryClientsKeys.expensePaymentType, rest?.id],
     queryFn: async () => await getExpensesPaymentType(rest?.id),
   });
   

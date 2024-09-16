@@ -17,7 +17,7 @@ const SharedCenterMessage = ({ message }: TSharedCenterMessage) => {
       <CardHeader className="pb-2">
       </CardHeader>
       <CardContent>
-        <p className="text-center">{message}</p>
+        <span className="text-center">{message}</span>
       </CardContent>
     </Card>
   );
