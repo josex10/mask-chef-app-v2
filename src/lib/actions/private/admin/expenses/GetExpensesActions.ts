@@ -84,6 +84,7 @@ export const getSingleExpense = async (
         "fechaEmision",
         "numeroConsecutivo",
         "createdBy.email",
+        "expenseSummary.id",
         "expenseSummary.TotalVenta",
         "expenseSummary.TotalDescuentos",
         "expenseSummary.TotalImpuesto",
@@ -123,6 +124,7 @@ export const getSingleExpense = async (
       fechaEmision: expense.fechaEmision,
       numeroConsecutivo: expense.numeroConsecutivo,
       createdByEmail: expense.createdBy?.email || null,
+      expenseSummaryId: expense.expenseSummary?.id || "",
       expenseSummaryTotalVenta: expense.expenseSummary?.TotalVenta || 0,
       expenseSummaryTotalDescuentos:
         expense.expenseSummary?.TotalDescuentos || 0,

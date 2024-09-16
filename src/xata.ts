@@ -138,20 +138,7 @@ const tables = [
     ],
     revLinks: [
       { column: "expense", table: "expenses_line_detail" },
-      { column: "expense", table: "expenses_summary" },
       { column: "expense", table: "expenses_payment_detail" },
-    ],
-  },
-  {
-    name: "expense_status",
-    columns: [
-      {
-        name: "name",
-        type: "text",
-        notNull: true,
-        defaultValue: "STATUS_NAME",
-      },
-      { name: "description", type: "text" },
     ],
   },
   {
@@ -265,7 +252,6 @@ const tables = [
         notNull: true,
         defaultValue: "0",
       },
-      { name: "expense", type: "link", link: { table: "expenses" } },
     ],
     revLinks: [{ column: "expenseSummary", table: "expenses" }],
   },
@@ -369,9 +355,6 @@ export type UsersRecord = Users & XataRecord;
 export type Expenses = InferredTypes["expenses"];
 export type ExpensesRecord = Expenses & XataRecord;
 
-export type ExpenseStatus = InferredTypes["expense_status"];
-export type ExpenseStatusRecord = ExpenseStatus & XataRecord;
-
 export type Providers = InferredTypes["providers"];
 export type ProvidersRecord = Providers & XataRecord;
 
@@ -393,7 +376,6 @@ export type DatabaseSchema = {
   users_x_restaurants: UsersXRestaurantsRecord;
   users: UsersRecord;
   expenses: ExpensesRecord;
-  expense_status: ExpenseStatusRecord;
   providers: ProvidersRecord;
   expenses_summary: ExpensesSummaryRecord;
   expenses_line_detail: ExpensesLineDetailRecord;

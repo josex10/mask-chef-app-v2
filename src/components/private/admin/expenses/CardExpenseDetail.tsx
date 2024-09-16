@@ -2,35 +2,14 @@
 
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getSingleExpense } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { convertDateToStandard } from "@/utils/helpers/dates";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { useQuery } from "@tanstack/react-query";
-import {
-  MoreVertical,
-} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import CardExpenseDetailSkeleton from "./Skeletons/CardExpenseDetailSkeleton";
-import { cutExpenseClave } from "../../../../utils/helpers/expenses";
-import { DialogExpensePayment } from "./DialogExpensePayment";
-import { Badge } from "@/components/ui/badge";
 import ExpenseDetailPaymentSection from "./ExpenseDetail/ExpenseDetailPaymentSection";
 import ExpenseDetailCardHeader from "./ExpenseDetail/ExpenseDetailCardHeader";
 
