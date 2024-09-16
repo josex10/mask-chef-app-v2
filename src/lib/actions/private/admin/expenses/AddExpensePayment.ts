@@ -1,5 +1,6 @@
 "use server";
 
+import { ICustomSingleExpensePaymentDetail } from "@/utils/interfaces/private/admin/customSingleExpensePaymentDetail";
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { ExpensePaymentDetailSchema } from "@/utils/schemas/private/ExpensePaymentDetailSchema";
 import { getXataClient } from "@/xata";
@@ -27,10 +28,37 @@ export const addExpensePayment = async (data: any): Promise<string> => {
       isPaid: true,
     });
 
+    const expensePaymentDetailsCustomData =
+      await xata.db.expenses_payment_detail
+        .select([
+          "id",
+          "payment_type.type",
+          "referenceNumber",
+          "notes",
+          "payedBy.email",
+          "xata.createdAt",
+        ])
+        .filter({
+          id: newExpensePaymentDetail.id,
+        })
+        .getFirst();
+
+    if (!expensePaymentDetailsCustomData)
+      throw new Error("No se ha podido obtener la información del pago.");
+
+    const finalResult: ICustomSingleExpensePaymentDetail = {
+      id: expensePaymentDetailsCustomData.id,
+      paymentTypeType: expensePaymentDetailsCustomData.payment_type?.type || "",
+      referenceNumber: expensePaymentDetailsCustomData.referenceNumber || "",
+      notes: expensePaymentDetailsCustomData.notes || "",
+      createdAt: expensePaymentDetailsCustomData.xata.createdAt,
+      payedBy: expensePaymentDetailsCustomData.payedBy?.email || "",
+    };
+
     const response: IServerActionResponse = {
       error: false,
       message: "Se ha agregado el pago a la factura de manera correcta.",
-      data: newExpensePaymentDetail,
+      data: finalResult,
     };
 
     return JSON.stringify(response);

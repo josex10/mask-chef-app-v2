@@ -1,17 +1,14 @@
 import { Separator } from "@/components/ui/separator";
 import { convertDateToStandard } from "@/utils/helpers/dates";
 import { ICustomSingleExpensePaymentDetail } from "@/utils/interfaces/private/admin/customSingleExpensePaymentDetail";
-import { Calendar, HandCoins, NotebookPen } from "lucide-react";
-
-type TExpenseDetailPaymentSectionProps = {
-  expenseData: ICustomSingleExpensePaymentDetail;
-};
+import { Calendar, HandCoins, NotebookPen, UserRoundCheck } from "lucide-react";
 
 const ExpenseDetailPaymentSection = ({
   paymentTypeType,
   referenceNumber,
   notes,
   createdAt,
+  payedBy
 }: ICustomSingleExpensePaymentDetail) => {
   return (
     <>
@@ -47,6 +44,17 @@ const ExpenseDetailPaymentSection = ({
               )}
             </dd>
           </div>
+          <div className="flex items-center justify-between">
+            <dt className="flex items-center gap-1 text-muted-foreground">
+              <UserRoundCheck className="h-4 w-4" />
+              Pagado por:
+            </dt>
+            <dd>
+              {payedBy}
+            </dd>
+          </div>
+
+          
         </dl>
       </div>
     </>
