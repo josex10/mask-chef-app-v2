@@ -17,7 +17,7 @@ const ExpensesPage = () => {
                   content="Contempla el monto total de los gastos mostrados en la tabla."
                 />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-row justify-between">
               <div className="flex flex-row justify-end items-center gap-2 my-2">
                 Filters
                 <ListFilter className="h-3.5 w-3.5" />
@@ -25,8 +25,8 @@ const ExpensesPage = () => {
               <div className="ml-auto  gap-2 mb-2">
                 <ExpenseDateRangeFilter />
               </div>
-              <CardExpenseTable />
             </div>
+              <CardExpenseTable />
           </div>
           <div>
             <CardExpenseDetail />
