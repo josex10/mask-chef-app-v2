@@ -34,7 +34,7 @@ const CardExpenseDetail = () => {
   const expenseData = JSON.parse(expense) as ICustomSingleExpense;
 
   return (
-    <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
+    <Card className="h-[88vh] overflow-y-auto">
       <ExpenseDetailCardHeader {...expenseData} />
       <CardContent className="p-6 text-sm">
         <div className="grid gap-3">

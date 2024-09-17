@@ -75,30 +75,32 @@ const ExpenseDetailCardHeader = ({
     toast.success(message);
   };
   return (
-    <CardHeader className="flex flex-row items-start bg-muted/50 w-full ">
-      <div className="grid gap-0.5 w-full">
-        <CardTitle className="flex flex-row justify-between items-center">
-          <span>Detalle del Gasto</span>
-          <Button onClick={handleDelete} variant="destructive"  size="sm">
-            <Trash2 size={16}/>
-          </Button>
-        </CardTitle>
-        <Separator className="my-2" />
-        <CardDescription>{cutExpenseClave(clave)}</CardDescription>
-        <div className="flex flex-row justify-between">
-          <div>Fecha: {convertDateToStandard(String(fechaEmision))}</div>
-          <div>
-            {isPaid ? (
-              <Badge className="text-xs text-center" variant="default">
-                Pagado
-              </Badge>
-            ) : (
-              <DialogExpensePayment />
-            )}
+    <div className="sticky top-0 z-10 bg-background">
+      <CardHeader className="flex flex-row items-start bg-muted/50 w-full ">
+        <div className="grid gap-0.5 w-full">
+          <CardTitle className="flex flex-row justify-between items-center">
+            <span>Detalle del Gasto</span>
+            <Button onClick={handleDelete} variant="destructive" size="sm">
+              <Trash2 size={16} />
+            </Button>
+          </CardTitle>
+          <Separator className="my-2" />
+          <CardDescription>{cutExpenseClave(clave)}</CardDescription>
+          <div className="flex flex-row justify-between">
+            <div>Fecha: {convertDateToStandard(String(fechaEmision))}</div>
+            <div>
+              {isPaid ? (
+                <Badge className="text-xs text-center" variant="default">
+                  Pagado
+                </Badge>
+              ) : (
+                <DialogExpensePayment />
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </CardHeader>
+      </CardHeader>
+    </div>
   );
 };
 

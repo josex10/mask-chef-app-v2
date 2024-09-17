@@ -1,15 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import CardExpenseTableRow from "./CardExpenseTableRow";
 import { getAllExpenses } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { useQuery } from "@tanstack/react-query";
 
@@ -17,53 +8,42 @@ import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroup
 import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import ExpenseTablePagination from "./ExpenseTablePagination";
-import { useGetExpenseTableQueryClientKey, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import {
+  useGetExpenseTableQueryClientKey,
+  useGetExpensesQueryParams,
+} from "@/utils/helpers/expenses";
+import ExpenseTableHeader from "./ExpenseTableHeader";
+import ExpenseTableBody from "./ExpenseTableBody";
 
 const CardExpenseTable = () => {
   const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
 
   const { data: expenses, isLoading } = useQuery<string | null>({
-    queryKey: useGetExpenseTableQueryClientKey({ startDate, endDate, expenseId }),
+    queryKey: useGetExpenseTableQueryClientKey({
+      startDate,
+      endDate,
+      expenseId,
+    }),
     queryFn: async () =>
       await getAllExpenses({ startDate, endDate, expenseId }),
   });
 
   if (isLoading) return <SkeletonTable />;
-
-  if (!expenses) {
-    return <SharedCenterMessage message="Sin Resultados" />;
-  }
-
-  const expensesData = JSON.parse(expenses) as IGroupExpenseTable[];
-
-  if (!expensesData || expensesData.length === 0) {
-    return <SharedCenterMessage message="Sin Resultados" />;
-  }
-
+  const expensesData = expenses
+    ? (JSON.parse(expenses) as IGroupExpenseTable[])
+    : [];
   return (
-    <Card>
+    <Card className="h-[55vh] overflow-y-auto">
       <CardContent>
-        <Table className="z-0">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Proveedor</TableHead>
-              <TableHead className="hidden sm:table-cell">Estado</TableHead>
-              <TableHead className="hidden md:table-cell">Fecha</TableHead>
-              <TableHead className="table-cell">Monto</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {expensesData.map((expense, index) => (
-              <CardExpenseTableRow
-                key={index}
-                expense={expense}
-              />
-            ))}
-          </TableBody>
-          {/* <TableFooter>
-            <ExpenseTablePagination />
-          </TableFooter> */}
-        </Table>
+        <ExpenseTableHeader />
+        {!expensesData || expensesData.length === 0 ? (
+          <SharedCenterMessage message="Sin Resultados" />
+        ) : (
+          <ExpenseTableBody expensesData={expensesData} />
+        )}
+
+        {!expensesData ||
+          (expensesData.length > 10 && <ExpenseTablePagination />)}
       </CardContent>
     </Card>
   );

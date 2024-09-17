@@ -38,7 +38,7 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
 
   return (
     <TableRow onClick={handleOnClick} className={selectedClass}>
-      <TableCell>
+      <TableCell className="w-[30vw] ">
         <div className="font-medium">{expense.providerName}</div>
         <div className="hidden text-sm text-muted-foreground md:inline">
           {cutExpenseClave(expense.clave)}

@@ -44,7 +44,7 @@ const CardExpenseFinatialInfo = ({
   }
 
   return (
-    <Card className="sm:col-span-2">
+    <Card className="sm:col-span-2 md:h-[20vh]">
       <CardHeader className="pb-2">
         <CardDescription>Monto Total</CardDescription>
         <CardTitle className="text-2xl">
