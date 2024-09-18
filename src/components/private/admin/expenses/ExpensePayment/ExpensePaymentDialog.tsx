@@ -25,9 +25,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { ExpensePaymentDetailSchema } from "@/utils/schemas/private/ExpensePaymentDetailSchema";
-import { getExpensesPaymentType } from "@/lib/actions/private/admin/expenses/GetExpensesPaymentType";
+
 import useStoreAuth from "@/store/private/admin/auth";
 import {
   Select,
@@ -38,47 +38,23 @@ import {
 } from "@/components/ui/select";
 import { IExpensePaymentType } from "@/utils/interfaces/private/admin/expensePaymentType";
 import { useState } from "react";
-import { addExpensePayment } from "@/lib/actions/private/admin/expenses/AddExpensePayment";
-import toast from "react-hot-toast";
-import {
-  useGetExpenseTableQueryClientKey,
-  useGetSingleExpenseQueryClientKey,
-  useGetExpensesQueryParams,
-} from "@/utils/helpers/expenses";
+import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
-import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
-import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
-import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
-import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
-import { ICustomSingleExpensePaymentDetail } from "@/utils/interfaces/private/admin/customSingleExpensePaymentDetail";
+import { useGetExpensePaymentData } from "@/lib/hooks/expenses/useExpensePaymentType";
+import { useExpenseAddPayment } from "@/lib/hooks/expenses/useExpenseAddPayment";
 
-const test = async () => {
-  return await new Promise((resolve) => setTimeout(resolve, 3000));
-};
-
-export function DialogExpensePayment() {
-  const queryClient = useQueryClient();
-  const rest = useStoreAuth((state) => state.selectedRestaurant);
-  const userLogged = useStoreAuth((state) => state.user);
-  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
-  const singleExpenseKey = useGetSingleExpenseQueryClientKey({
-    startDate,
-    endDate,
-    expenseId,
-  });
-  const tableExpenseKey = useGetExpenseTableQueryClientKey({
-    startDate,
-    endDate,
-    expenseId,
-  });
-  const { data, isLoading } = useQuery<string | null>({
-    queryKey: [EQueryClientsKeys.expensePaymentType, rest?.id],
-    queryFn: async () => await getExpensesPaymentType(rest?.id),
-  });
-
+export function ExpensePaymentDialog() {
   const [open, setOpen] = useState(false);
-  const [loading, setIsLoading] = useState(false);
+  const userLogged = useStoreAuth((state) => state.user);
+  const { expenseId } = useGetExpensesQueryParams();
+  const {
+    data,
+    isLoading: isLoadingPayment,
+    isFetching: isFetchingPayment,
+  } = useGetExpensePaymentData();
+
+  const mutation = useExpenseAddPayment();
 
   const form = useForm<z.infer<typeof ExpensePaymentDetailSchema>>({
     resolver: zodResolver(ExpensePaymentDetailSchema),
@@ -91,63 +67,15 @@ export function DialogExpensePayment() {
     },
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  //TODO: CREATER A SKELETOR FOR THIS FORM
+  if (isLoadingPayment || isFetchingPayment) return <div>Loading...</div>;
 
   const handleAction = async (data: any) => {
-    try {
-      setIsLoading(true);
-
-      const cacheData = queryClient.getQueryData<string | null>(
-        singleExpenseKey
-      );
-      if (!cacheData) {
-        toast.error("No se pudo obtener el gasto");
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await addExpensePayment(data);
-      const { error, message, data: responseData } = JSON.parse(response) as IServerActionResponse;
-
-    
-      if (error) {
-        toast.error(message);
-        setIsLoading(false);
-        return;
-      }
-
-      const cacheExpense = JSON.parse(cacheData) as ICustomSingleExpense;
-      const newPaymentDetail = responseData as ICustomSingleExpensePaymentDetail;
-      cacheExpense.isPaid = true;
-      cacheExpense.paymentDetail = newPaymentDetail;
-      const newCacheData = JSON.stringify(cacheExpense);
-      queryClient.setQueryData<string | null>(singleExpenseKey, () => {
-        return newCacheData;
-      });
-
-      const cacheTableData = queryClient.getQueryData<string | null>(
-        tableExpenseKey
-      );
-      if (cacheTableData) {
-        const cacheTable = JSON.parse(cacheTableData) as IGroupExpenseTable[];
-        const newCacheTable = cacheTable.map((expense) => {
-          if (expense.id === expenseId) {
-            expense.isPaid = true;
-          }
-          return expense;
-        });
-        queryClient.setQueryData<string | null>(tableExpenseKey, () => {
-          return JSON.stringify(newCacheTable);
-        });
-      }
-
-      toast.success(message);
-      setIsLoading(false);
-      setOpen(false);
-    } catch (error) {
-      toast.error("Ocurrió un error al realizar la acción");
-      setIsLoading(false);
-    }
+    mutation.mutate(data, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
   };
 
   const paymentTypes = data ? (JSON.parse(data) as IExpensePaymentType[]) : [];
@@ -188,7 +116,7 @@ export function DialogExpensePayment() {
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        disabled={loading}
+                        disabled={mutation.isPending}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -223,7 +151,7 @@ export function DialogExpensePayment() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          disabled={loading}
+                          disabled={mutation.isPending}
                           placeholder="Ex: 123456789"
                           {...field}
                         />
@@ -248,7 +176,7 @@ export function DialogExpensePayment() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          disabled={loading}
+                          disabled={mutation.isPending}
                           placeholder="Ex:Pago de gasto de la semana pasada"
                           {...field}
                         />
@@ -260,7 +188,7 @@ export function DialogExpensePayment() {
               </div>
 
               <DialogFooter className="sm:justify-end">
-                {loading ? (
+                {mutation.isPending ? (
                   <div className="flex justify-center w-full">
                     <LoadingSpinner className={cn("text-gray-500")} />
                   </div>

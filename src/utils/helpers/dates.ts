@@ -71,7 +71,6 @@ export const convertAnyTypeToDateUnix = (date: any): number => {
     if(isValid(new Date(fromUnixTime(date)))){
         return date;
     }
-
     return getUnixTime(new Date());
 };
 

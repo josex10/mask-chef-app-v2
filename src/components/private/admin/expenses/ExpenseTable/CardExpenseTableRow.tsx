@@ -3,9 +3,12 @@
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
+import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 import { checkIfDateIsAfterToday, checkIfDateIsBeforeToday, convertDateToStandard } from "@/utils/helpers/dates";
-import { cutExpenseClave, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import { cutExpenseClave, generateExpensePath, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type TCardExpenseProp = {
@@ -13,22 +16,25 @@ type TCardExpenseProp = {
 };
 
 const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
-  const router = useRouter();
   const pathName = usePathname();
   const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
+  const routerPuskHook = useRouterPush();
+  const queryClient = useQueryClient();
 
   if(!expense) return ;
 
 
   const handleOnClick = () => {
-    if (startDate || endDate) {
-      router.push(
-        `${pathName}?startDate=${startDate}&endDate=${endDate}&expenseId=${expense.id}`,
-        { scroll: false }
-      );
-      return;
-    }
-    router.push(`${pathName}?expenseId=${expense.id}`, { scroll: false });
+    const newUrl = `${pathName}${generateExpensePath(
+      startDate,
+      endDate,
+      expense.id
+    )}`;
+    routerPuskHook(newUrl).then(() => {
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.singleExpense],
+      });
+    });
   };
 
   const selectedClass =

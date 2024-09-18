@@ -1,9 +1,9 @@
-import CardExpenseUpload from "@/components/private/admin/expenses/CardExpenseUpload";
-import CardExpenseFinatialInfo from "@/components/private/admin/expenses/CardExpenseFinatialInfo";
 import CardExpenseTable from "@/components/private/admin/expenses/ExpenseTable/CardExpenseTable";
-import CardExpenseDetail from "@/components/private/admin/expenses/CardExpenseDetail";
 import { ExpenseDateRangeFilter } from "@/components/private/admin/expenses/ExpenseTable/filters/ExpenseDateRangeFilter";
 import { ListFilter } from "lucide-react";
+import CardExpenseDetail from "@/components/private/admin/expenses/ExpenseDetail/CardExpenseDetail";
+import CardExpenseUpload from "@/components/private/admin/expenses/ExpenseUpload/CardExpenseUpload";
+import CardExpenseFinatialInfo from "@/components/private/admin/expenses/ExpenseFinantialInfo/CardExpenseFinatialInfo";
 
 const ExpensesPage = () => {
   return (

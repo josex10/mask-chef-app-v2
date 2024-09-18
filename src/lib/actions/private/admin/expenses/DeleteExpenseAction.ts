@@ -1,27 +1,33 @@
 "use server";
 
+import { IDeleteExpenseAction } from "@/utils/interfaces/private/admin/expenseDeleteAction";
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
+import { ExpenseDeleteSchema } from "@/utils/schemas/private/ExpenseDeleteSchema";
 import { getXataClient } from "@/xata";
 
-type TDeleteExpenseAction = {
-  expenseId: string;
-  expenseSummaryId: string;
-};
 export const deleteExpenseAction = async (
-  data: TDeleteExpenseAction
+  data: IDeleteExpenseAction
 ): Promise<string> => {
   try {
     const xata = getXataClient();
     const transactionsArray = [];
 
-    const expenseDBId = await xata.db.expenses.read(data.expenseId);
+    const validation = ExpenseDeleteSchema.safeParse(data);
+
+    if (validation.error) {
+      throw new Error("No se pudo eliminar el gasto");
+    }
+
+    const { expenseId, expenseSummaryId } = validation.data;
+
+    const expenseDBId = await xata.db.expenses.read(expenseId);
     if (!expenseDBId) throw new Error("El gasto no existe");
     transactionsArray.push({
       delete: { table: "expenses" as const, id: expenseDBId.id },
     });
 
     const expenseSummary = await xata.db.expenses_summary.read(
-      data.expenseSummaryId
+      expenseSummaryId
     );
     if (!expenseSummary) throw new Error("El resumen del gasto no existe");
     transactionsArray.push({
@@ -29,7 +35,7 @@ export const deleteExpenseAction = async (
     });
 
     const expensePaymentDetail = await xata.db.expenses_payment_detail
-      .filter({ expense: data.expenseId })
+      .filter({ expense: expenseId })
       .getFirst();
     if (expensePaymentDetail) {
       transactionsArray.push({
@@ -41,7 +47,7 @@ export const deleteExpenseAction = async (
     }
 
     const expenseLineDetail = await xata.db.expenses_line_detail
-      .filter({ expense: data.expenseId })
+      .filter({ expense: expenseId })
       .getAll();
     if (expenseLineDetail) {
       expenseLineDetail.forEach((line) => {
@@ -56,7 +62,7 @@ export const deleteExpenseAction = async (
 
     const response: IServerActionResponse = {
       error: false,
-      message: `El gasto se ha eliminado el gasto: ${expenseDBId.clave} `,
+      message: `El gasto se ha eliminado el gasto correctamente. `,
       data: null,
     };
     return JSON.stringify(response);

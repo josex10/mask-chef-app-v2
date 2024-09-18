@@ -10,12 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { getExpensesSummary } from "@/lib/actions/private/admin/expenses/GetExpensesSummary";
-import { useQuery } from "@tanstack/react-query";
-import useStoreAuth from "@/store/private/admin/auth";
-import CardExpenseFinatialInfoSkeleton from "./Skeletons/CardExpenseFinatialInfoSkeleton";
-import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
-import { convertUnixToDate } from "@/utils/helpers/dates";
+import CardExpenseFinatialInfoSkeleton from "../Skeletons/CardExpenseFinatialInfoSkeleton";
+import { useExpenseTotalAmountOfTable } from "@/lib/hooks/expenses/useExpenseTotalAmountOfTable";
 
 type TCardExpenseFinatialInfoProps = {
   content: string;
@@ -24,21 +20,8 @@ type TCardExpenseFinatialInfoProps = {
 const CardExpenseFinatialInfo = ({
   content,
 }: TCardExpenseFinatialInfoProps) => {
-  const rest = useStoreAuth((state) => state.selectedRestaurant);
-  const { startDate: startDateUnix, endDate: endDateUnix } =
-    useGetExpensesQueryParams();
+  const { data, isLoading } = useExpenseTotalAmountOfTable();
 
-  const { data, isLoading } = useQuery<number>({
-    queryKey: [`expensesFinantialInfo`, startDateUnix, endDateUnix],
-    queryFn: async () =>
-      getExpensesSummary(
-        rest?.id,
-        convertUnixToDate(startDateUnix),
-        convertUnixToDate(endDateUnix)
-      ),
-  });
-
-  //TODO: get filter from state, its not implemented yet
   if (isLoading) {
     return <CardExpenseFinatialInfoSkeleton />;
   }
