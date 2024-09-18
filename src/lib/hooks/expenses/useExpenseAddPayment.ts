@@ -16,10 +16,10 @@ export const useExpenseAddPayment = () => {
     onSuccess: async (data: string) => {
       const response = JSON.parse(data) as IServerActionResponse;
 
-      await queryClient.refetchQueries({
+      queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.expensesTable],
       });
-      await queryClient.refetchQueries({
+      queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });
       toast.success(response.message);
