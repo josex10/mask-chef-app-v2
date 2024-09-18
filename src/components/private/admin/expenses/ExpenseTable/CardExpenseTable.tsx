@@ -1,37 +1,23 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { getAllExpenses } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
-import { useQuery } from "@tanstack/react-query";
-
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import SkeletonTable from "@/components/shared/Skeletons/SkeletonTable";
 import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import ExpenseTablePagination from "./ExpenseTablePagination";
-import {
-  useGetExpenseTableQueryClientKey,
-  useGetExpensesQueryParams,
-} from "@/utils/helpers/expenses";
 import ExpenseTableHeader from "./ExpenseTableHeader";
 import ExpenseTableBody from "./ExpenseTableBody";
+import { useGetExpenseTableData } from "@/lib/hooks/expenses/useExpenseTable";
 
 const CardExpenseTable = () => {
-  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
+  const { data: expenses, isLoading, isFetching } = useGetExpenseTableData();
 
-  const { data: expenses, isLoading } = useQuery<string | null>({
-    queryKey: useGetExpenseTableQueryClientKey({
-      startDate,
-      endDate,
-      expenseId,
-    }),
-    queryFn: async () =>
-      await getAllExpenses({ startDate, endDate, expenseId }),
-  });
+  if (isLoading || isFetching) return <SkeletonTable />;
 
-  if (isLoading) return <SkeletonTable />;
   const expensesData = expenses
     ? (JSON.parse(expenses) as IGroupExpenseTable[])
     : [];
+
   return (
     <Card className="h-[55vh] overflow-y-auto">
       <CardContent>

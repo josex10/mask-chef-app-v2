@@ -3,22 +3,13 @@
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { convertDateToStandard } from "@/utils/helpers/dates";
-import {
-  cutExpenseClave,
-  useGetExpensesQueryParams,
-  useGetExpenseTableQueryClientKey,
-  useGetSingleExpenseQueryClientKey,
-} from "@/utils/helpers/expenses";
-import { DialogExpensePayment } from "../DialogExpensePayment";
+import { cutExpenseClave } from "@/utils/helpers/expenses";
 import { Badge } from "@/components/ui/badge";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { Button } from "@/components/ui/button";
-import { deleteExpenseAction } from "@/lib/actions/private/admin/expenses/DeleteExpenseAction";
-import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
-import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { Trash2 } from "lucide-react";
+import { ExpensePaymentDialog } from "../ExpensePayment/ExpensePaymentDialog";
+import { useExpenseDeleteExpense } from "@/lib/hooks/expenses/useExpenseDeleteExpense";
 
 const ExpenseDetailCardHeader = ({
   clave,
@@ -27,52 +18,10 @@ const ExpenseDetailCardHeader = ({
   expenseSummaryId,
   id,
 }: ICustomSingleExpense) => {
-  const queryClient = useQueryClient();
-  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
-  const singleExpenseKey = useGetSingleExpenseQueryClientKey({
-    startDate,
-    endDate,
-    expenseId,
-  });
-  const tableExpenseKey = useGetExpenseTableQueryClientKey({
-    startDate,
-    endDate,
-    expenseId,
-  });
+  const deleleExpenseMutation = useExpenseDeleteExpense();
 
   const handleDelete = async () => {
-    const result = await deleteExpenseAction({
-      expenseId: id,
-      expenseSummaryId: expenseSummaryId,
-    });
-    const { error, message } = JSON.parse(result) as IServerActionResponse;
-    if (error) {
-      toast.error(message);
-      return;
-    }
-    queryClient.setQueryData<string | null>(singleExpenseKey, () => {
-      return null;
-    });
-
-    const cacheTableData = queryClient.getQueryData<string | null>(
-      tableExpenseKey
-    );
-    if (cacheTableData) {
-      const cacheTable = JSON.parse(cacheTableData) as IGroupExpenseTable[];
-      const newCacheTable = cacheTable.map((expense) => {
-        if (expense.id !== expenseId) {
-          return expense;
-        }
-      });
-
-      queryClient.setQueryData<string | null>(tableExpenseKey, () => {
-        if (newCacheTable.length === 0) {
-          return null;
-        }
-        return JSON.stringify(newCacheTable);
-      });
-    }
-    toast.success(message);
+    deleleExpenseMutation.mutate({ expenseId: id, expenseSummaryId });
   };
   return (
     <div className="sticky top-0 z-10 bg-background">
@@ -94,7 +43,7 @@ const ExpenseDetailCardHeader = ({
                   Pagado
                 </Badge>
               ) : (
-                <DialogExpensePayment />
+                <ExpensePaymentDialog />
               )}
             </div>
           </div>

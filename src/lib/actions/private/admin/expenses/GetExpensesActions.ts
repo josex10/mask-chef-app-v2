@@ -27,8 +27,12 @@ export const getAllExpenses = async (
       throw new Error("Invalid start date");
     }
 
-    const {start} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.startDate));
-    const {end} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.endDate));
+    const { start } = getStardAndEndDateOfTheDay(
+      convertUnixToDate(filter.startDate)
+    );
+    const { end } = getStardAndEndDateOfTheDay(
+      convertUnixToDate(filter.endDate)
+    );
 
     const expenses = await xata.db.expenses
       .select([
@@ -111,12 +115,18 @@ export const getSingleExpense = async (
       .getAll();
 
     const expensePaymentDetails = await xata.db.expenses_payment_detail
-      .select(["id", "payment_type.type", "referenceNumber","notes", "payedBy.email", "xata.createdAt"])
+      .select([
+        "id",
+        "payment_type.type",
+        "referenceNumber",
+        "notes",
+        "payedBy.email",
+        "xata.createdAt",
+      ])
       .filter({
         expense: expenseId,
       })
       .getFirst();
-    
 
     const result: ICustomSingleExpense = {
       id: expense.id,
@@ -146,14 +156,16 @@ export const getSingleExpense = async (
         };
       }),
       isPaid: expense.isPaid,
-      paymentDetail: (!expensePaymentDetails)? null : {
-        id: expensePaymentDetails.id || "",
-        paymentTypeType: expensePaymentDetails.payment_type?.type || "",
-        referenceNumber: expensePaymentDetails.referenceNumber || "",
-        notes: expensePaymentDetails.notes || "",
-        createdAt: expensePaymentDetails.xata.createdAt,
-        payedBy: expensePaymentDetails.payedBy?.email || "",
-      }
+      paymentDetail: !expensePaymentDetails
+        ? null
+        : {
+            id: expensePaymentDetails.id || "",
+            paymentTypeType: expensePaymentDetails.payment_type?.type || "",
+            referenceNumber: expensePaymentDetails.referenceNumber || "",
+            notes: expensePaymentDetails.notes || "",
+            createdAt: expensePaymentDetails.xata.createdAt,
+            payedBy: expensePaymentDetails.payedBy?.email || "",
+          },
     };
     return result ? JSON.stringify(result) : null;
   } catch (error) {

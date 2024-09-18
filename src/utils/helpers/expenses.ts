@@ -57,3 +57,30 @@ export const useGetSingleExpenseQueryClientKey = (data: IExpenseQueryParams):any
   return [EQueryClientsKeys.singleExpense, data.expenseId];
 };
 
+export const generateExpensePath = (
+  startDate: number,
+  endDate: number,
+  expenseId: string | null
+): string => {
+  let stringPath = "";
+  if (startDate) {
+    stringPath +=
+      stringPath.length > 0
+        ? `&startDate=${startDate}`
+        : `?startDate=${startDate}`;
+  }
+  if (endDate) {
+    stringPath +=
+      stringPath.length > 0 ? `&endDate=${endDate}` : `?endDate=${endDate}`;
+  }
+
+  if (expenseId) {
+    stringPath +=
+      stringPath.length > 0
+        ? `&expenseId=${expenseId}`
+        : `?expenseId=${expenseId}`;
+  }
+
+  return stringPath;
+};
+

@@ -4,26 +4,17 @@ import SharedCenterMessage from "@/components/shared/SharedCenterMessage";
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getSingleExpense } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { convertDateToStandard } from "@/utils/helpers/dates";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
-import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import CardExpenseDetailSkeleton from "./Skeletons/CardExpenseDetailSkeleton";
-import ExpenseDetailPaymentSection from "./ExpenseDetail/ExpenseDetailPaymentSection";
-import ExpenseDetailCardHeader from "./ExpenseDetail/ExpenseDetailCardHeader";
+import CardExpenseDetailSkeleton from "../Skeletons/CardExpenseDetailSkeleton";
+import ExpenseDetailPaymentSection from "./ExpenseDetailPaymentSection";
+import ExpenseDetailCardHeader from "./ExpenseDetailCardHeader";
+import { useGetExpenseSingleData } from "@/lib/hooks/expenses/useExpenseSingle";
 
 const CardExpenseDetail = () => {
-  const searchParams = useSearchParams();
+  const { data: expense, isLoading, isFetching } = useGetExpenseSingleData();
 
-  const expenseId = searchParams.get("expenseId");
-
-  const { data: expense, isLoading } = useQuery<string | null>({
-    queryKey: ["singleExpense", String(expenseId)],
-    queryFn: async () => await getSingleExpense(expenseId),
-  });
-
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <CardExpenseDetailSkeleton />;
   }
 
