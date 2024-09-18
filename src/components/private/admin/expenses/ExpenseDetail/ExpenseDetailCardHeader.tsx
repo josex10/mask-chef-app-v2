@@ -6,10 +6,8 @@ import { convertDateToStandard } from "@/utils/helpers/dates";
 import { cutExpenseClave } from "@/utils/helpers/expenses";
 import { Badge } from "@/components/ui/badge";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { ExpensePaymentDialog } from "../ExpensePayment/ExpensePaymentDialog";
-import { ExpenseDetailPaymentDialog } from "./ExpenseDetailPaymentDialog";
+import { ExpenseDetailDeleteExpenseDialog } from "./ExpenseDetailDeleteExpenseDialog";
 
 const ExpenseDetailCardHeader = ({
   clave,
@@ -25,7 +23,7 @@ const ExpenseDetailCardHeader = ({
         <div className="grid gap-0.5 w-full">
           <CardTitle className="flex flex-row justify-between items-center">
             <span>Detalle del Gasto</span>
-            <ExpenseDetailPaymentDialog expenseId={id} expenseSummaryId={expenseSummaryId}/>
+            <ExpenseDetailDeleteExpenseDialog expenseId={id} expenseSummaryId={expenseSummaryId}/>
           </CardTitle>
           <Separator className="my-2" />
           <CardDescription>{cutExpenseClave(clave)}</CardDescription>

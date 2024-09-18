@@ -5,14 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
-import { checkIfDateIsAfterToday, checkIfDateIsBeforeToday, convertDateToStandard } from "@/utils/helpers/dates";
-import { cutExpenseClave, generateExpensePath, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import {
+  checkIfDateIsBeforeToday,
+  convertDateToStandard,
+} from "@/utils/helpers/dates";
+import {
+  cutExpenseClave,
+  generateExpensePath,
+  useGetExpensesQueryParams,
+} from "@/utils/helpers/expenses";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type TCardExpenseProp = {
-  expense: IGroupExpenseTable
+  expense: IGroupExpenseTable;
 };
 
 const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
@@ -21,8 +28,7 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const routerPuskHook = useRouterPush();
   const queryClient = useQueryClient();
 
-  if(!expense) return ;
-
+  if (!expense) return;
 
   const handleOnClick = () => {
     const newUrl = `${pathName}${generateExpensePath(
@@ -31,6 +37,7 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
       expense.id
     )}`;
     routerPuskHook(newUrl).then(() => {
+      if (expenseId === expense.id) return;
       queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });
@@ -56,7 +63,10 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
             Pagado
           </Badge>
         ) : (
-          <Badge className="text-xs" variant={isOverdue ? 'destructive' : 'outline'}>
+          <Badge
+            className="text-xs"
+            variant={isOverdue ? "destructive" : "outline"}
+          >
             Pendiente
           </Badge>
         )}

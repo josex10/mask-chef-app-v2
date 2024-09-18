@@ -10,18 +10,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useExpenseDeleteExpense } from "@/lib/hooks/expenses/useExpenseDeleteExpense";
-import useStoreExpenseDetailPaymentDialog from "@/store/private/expenses/storeExpenseDetailPaymentDialog";
+import useStoreExpenseDeleteExpenseDialog from "@/store/private/expenses/storeExpenseDeleteExpenseDialog";
 import { Trash2 } from "lucide-react";
 
-type TExpenseDetailPaymentDialogProps = {
+type TExpenseDetailDeleteExpenseDialogProps = {
   expenseId: string;
   expenseSummaryId: string;
 };
-export function ExpenseDetailPaymentDialog({
+export function ExpenseDetailDeleteExpenseDialog({
   expenseId,
   expenseSummaryId,
-}: TExpenseDetailPaymentDialogProps) {
-  const handleDialog = useStoreExpenseDetailPaymentDialog();
+}: TExpenseDetailDeleteExpenseDialogProps) {
+  const handleDialog = useStoreExpenseDeleteExpenseDialog();
   const deleleExpenseMutation = useExpenseDeleteExpense();
 
   const handleDelete = async () => {
@@ -55,11 +55,9 @@ export function ExpenseDetailPaymentDialog({
           </DialogDescription>
         </DialogHeader>
         {deleleExpenseMutation.isPending ? (
-          <DialogDescription>
-            <div className="flex justify-center w-full">
-              <LoadingSpinner className="text-gray-500" />
-            </div>
-          </DialogDescription>
+          <div className="flex justify-center w-full">
+            <LoadingSpinner className="text-gray-500" />
+          </div>
         ) : (
           <DialogFooter>
             <Button onClick={handleDelete}>Eliminar</Button>
