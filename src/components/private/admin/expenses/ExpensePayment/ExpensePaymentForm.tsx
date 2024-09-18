@@ -28,19 +28,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const getForm = (expenseId: string | null, userLogged: string | undefined) => {
-  return useForm<z.infer<typeof ExpensePaymentDetailSchema>>({
-    resolver: zodResolver(ExpensePaymentDetailSchema),
-    defaultValues: {
-      expense: expenseId || "",
-      payment_type: "",
-      referenceNumber: "",
-      notes: "",
-      payedBy: userLogged || "",
-    },
-  });
-};
-
 const ExpensePaymentForm = () => {
   const { expenseId } = useGetExpensesQueryParams();
   const handleDialog = useStoreExpenseDetailPaymentDialog();
@@ -62,7 +49,16 @@ const ExpensePaymentForm = () => {
     });
   };
 
-  const form = getForm(expenseId, userLogged?.id);
+  const form = useForm<z.infer<typeof ExpensePaymentDetailSchema>>({
+    resolver: zodResolver(ExpensePaymentDetailSchema),
+    defaultValues: {
+      expense: expenseId || "",
+      payment_type: "",
+      referenceNumber: "",
+      notes: "",
+      payedBy: userLogged?.id || "",
+    },
+  });
 
   if (isLoadingPayment || isFetchingPayment) return <div>Loading...</div>;
 
