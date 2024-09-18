@@ -18,6 +18,7 @@ type TCreateExpenseFromXml = {
   error: boolean;
   message: string | null;
   expenseId: string | null;
+  expenseDate: Date | null;
 };
 export const createExpenseFromXml = async (
   xmlData: string,
@@ -112,12 +113,14 @@ export const createExpenseFromXml = async (
       error: false,
       message: "Create Successfully",
       expenseId: expenseResponse.expenseId,
+      expenseDate: expenseResponse.expenseDate
     };
   } catch (error: any) {
     return {
       error: true,
       message: error.message ? error.message : "Error creating the expense.",
       expenseId: null,
+      expenseDate: null
     };
   }
 };
@@ -234,6 +237,7 @@ type TCreateExpenseOnDb = {
   error: boolean;
   message: string;
   expenseId: string | null;
+  expenseDate: Date | null;
 };
 
 const createExpenseSummaryOnDb = async (summary: any) => {
@@ -316,22 +320,22 @@ const createExpenseOnDb = async (
   providerId: string,
   summaryId: string
 ): Promise<TCreateExpenseOnDb> => {
-  const newExpense: IExpense = {
-    clave: expense.Clave,
-    codigoActividad: expense.CodigoActividad,
-    numeroConsecutivo: expense.NumeroConsecutivo,
-    fechaEmision: new Date(expense.FechaEmision),
-    restaurant: restaurant.id ? restaurant.id : "",
-    createdBy: user.id ? user.id : "",
-    provider: providerId,
-    expenseSummary: summaryId,
-  };
-  const validation = ExpenseSchema.safeParse(newExpense);
-  if (validation.error) {
-    throw new Error("Error validating the expense");
-  }
-
   try {
+    const newExpense: IExpense = {
+      clave: expense.Clave,
+      codigoActividad: expense.CodigoActividad,
+      numeroConsecutivo: expense.NumeroConsecutivo,
+      fechaEmision: new Date(expense.FechaEmision),
+      restaurant: restaurant.id ? restaurant.id : "",
+      createdBy: user.id ? user.id : "",
+      provider: providerId,
+      expenseSummary: summaryId,
+    };
+    const validation = ExpenseSchema.safeParse(newExpense);
+    if (validation.error) {
+      throw new Error("Error validating the expense");
+    }
+
     const xata = getXataClient();
 
     const filterExpense = await xata.db.expenses
@@ -340,13 +344,19 @@ const createExpenseOnDb = async (
     if (filterExpense)
       throw new Error("The expense 'CLAVE' is already on the system.");
     const storedExpense = await xata.db.expenses.create(newExpense);
-    return { error: false, message: "Success Process", expenseId: storedExpense.id };
+    return {
+      error: false,
+      message: "Success Process",
+      expenseId: storedExpense.id,
+      expenseDate: storedExpense.fechaEmision,
+    };
   } catch (error: any) {
     await removeExpenseOnErrorCase(null, summaryId);
     return {
       error: true,
       message: error.message ? error.message : "Error creating the expense.",
       expenseId: null,
+      expenseDate: null,
     };
   }
 };
