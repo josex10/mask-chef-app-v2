@@ -67,7 +67,6 @@ export function ExpensePaymentDialog() {
     },
   });
 
-  //TODO: CREATER A SKELETOR FOR THIS FORM
   if (isLoadingPayment || isFetchingPayment) return <div>Loading...</div>;
 
   const handleAction = async (data: any) => {
