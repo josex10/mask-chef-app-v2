@@ -6,6 +6,7 @@ export interface ICustomSingleExpense{
     clave: string;
     fechaEmision: Date;
     numeroConsecutivo: string;
+    paymentExpirationDate: Date,
     createdByEmail: string | null;
     expenseSummaryId: string;
     expenseSummaryTotalVenta: number;
