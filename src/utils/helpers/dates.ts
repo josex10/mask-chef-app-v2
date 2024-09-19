@@ -8,11 +8,11 @@ import {
   startOfDay,
   endOfDay,
   getUnixTime,
-  parse,
   isValid,
   fromUnixTime,
   isAfter,
   isBefore,
+  isEqual,
 } from "date-fns";
 import { EFilters } from "../enums/filters";
 
@@ -114,3 +114,9 @@ export const checkIfADateIsBetweenTwoDates = (
 ) => {
   return isAfter(date, startDate) && isBefore(date, endDate);
 };
+
+export const checkIfDatesAreEqualWithoutTime = (date1: Date, date2: Date) => {
+  const formatDate1 = format(date1, "dd/MM/yyyy");
+  const formatDate2 = format(date2, "dd/MM/yyyy");
+  return isEqual(formatDate1, formatDate2);
+}

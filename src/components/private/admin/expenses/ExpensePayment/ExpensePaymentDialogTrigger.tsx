@@ -9,16 +9,12 @@ const ExpensePaymentDialogTrigger = () => {
   return (
     <DialogTrigger asChild>
       <Button
-        size="sm"
-        className="h-8 gap-1"
-        variant="ghost"
-        onClick={() => handleDialog.openDialog()}
-      >
-        <CreditCard className="h-3.5 w-3.5" />
-        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-          Pagar
-        </span>
-      </Button>
+          onClick={handleDialog.openDialog}
+          variant="secondary"
+          size="sm"
+        >
+          <CreditCard size={16} />
+        </Button>
     </DialogTrigger>
   );
 };
