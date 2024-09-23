@@ -29,7 +29,7 @@ const UploadExpenseBtn = () => {
   const routerPuskHook = useRouterPush();
   const queryClient = useQueryClient();
 
-  const { startDate, endDate } = useGetExpensesQueryParams();
+  const { startDate, endDate, offset } = useGetExpensesQueryParams();
 
   const { handleSubmit } = useForm();
 
@@ -95,7 +95,8 @@ const UploadExpenseBtn = () => {
     const newUrl = `${pathName}${generateExpensePath(
       startDate,
       endDate,
-      expenseId
+      expenseId, 
+      offset
     )}`;
     routerPuskHook(newUrl).then(() => {
       const needRefetch = checkIfADateIsBetweenTwoDates(

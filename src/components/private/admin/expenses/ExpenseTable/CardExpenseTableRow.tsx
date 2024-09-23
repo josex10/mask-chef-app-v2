@@ -24,7 +24,7 @@ type TCardExpenseProp = {
 
 const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   const pathName = usePathname();
-  const { startDate, endDate, expenseId } = useGetExpensesQueryParams();
+  const { startDate, endDate, expenseId, offset } = useGetExpensesQueryParams();
   const routerPuskHook = useRouterPush();
   const queryClient = useQueryClient();
 
@@ -34,7 +34,8 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
     const newUrl = `${pathName}${generateExpensePath(
       startDate,
       endDate,
-      expense.id
+      expense.id, 
+      offset
     )}`;
     routerPuskHook(newUrl).then(() => {
       if (expenseId === expense.id) return;

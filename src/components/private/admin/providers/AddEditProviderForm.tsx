@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 
 import {
   Form,
@@ -44,7 +43,6 @@ const AddEditProviderFormComponent = () => {
   });
 
   const handleAction: SubmitHandler<FieldValues> = async (formData) => {
-    console.log('added')
     router.push("/private/admin/providers");
   };
 
@@ -98,10 +96,7 @@ const AddEditProviderFormComponent = () => {
                       <FormItem>
                         <FormLabel>Identificación Tributaria</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="31015673"
-                            {...field}
-                          />
+                          <Input placeholder="31015673" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -116,10 +111,7 @@ const AddEditProviderFormComponent = () => {
                       <FormItem>
                         <FormLabel>Nombre Comercial</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Wings66 CR"
-                            {...field}
-                          />
+                          <Input placeholder="Wings66 CR" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -134,10 +126,7 @@ const AddEditProviderFormComponent = () => {
                       <FormItem>
                         <FormLabel>Teléfono</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="88774422"
-                            {...field}
-                          />
+                          <Input placeholder="88774422" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
