@@ -60,12 +60,12 @@ const CardExpenseTable = () => {
           <ExpenseTableBody expensesData={expensesData} />
         )}
 
-        {!expensesData ||
+        {/* {!expensesData ||
           (expensesData.length > 1 && (
             <ExpenseTablePagination
               hasNextPage={convertion.paginationData.hasNextPage}
             />
-          ))}
+          ))} */}
       </CardContent>
     </Card>
   );
