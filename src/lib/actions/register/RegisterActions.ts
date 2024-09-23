@@ -89,7 +89,6 @@ const registerUserProcess = async (): Promise<TRegisterUser> => {
       name: newUser.name ? newUser.name : "",
     };
   } catch (error) {
-    console.log(error);
     response.errorMessageU = "Error creating user.";
     return response;
   }
@@ -112,9 +111,12 @@ const registerRestaurantProcess = async (
   };
 
   try {
-    const uniqueRestaurantByLegalNumber = await xata.db.restaurants.filter({legalNumber: restaurant.legalNumber}).getFirst();
-    if(uniqueRestaurantByLegalNumber){
-      response.errorMessage = "Restaurant already exists with this legal number.";
+    const uniqueRestaurantByLegalNumber = await xata.db.restaurants
+      .filter({ legalNumber: restaurant.legalNumber })
+      .getFirst();
+    if (uniqueRestaurantByLegalNumber) {
+      response.errorMessage =
+        "Restaurant already exists with this legal number.";
       return response;
     }
   } catch (error) {
@@ -138,12 +140,16 @@ const registerRestaurantProcess = async (
     return response;
   }
 
-  if(favorite){
+  if (favorite) {
     try {
-      const groupOfRestaurants = await xata.db.users_x_restaurants.filter({id_user: user.id}).getAll();
-      if(groupOfRestaurants){
+      const groupOfRestaurants = await xata.db.users_x_restaurants
+        .filter({ id_user: user.id })
+        .getAll();
+      if (groupOfRestaurants) {
         groupOfRestaurants.map(async (rest) => {
-          await xata.db.users_x_restaurants.update(rest.id, {favorite: false});
+          await xata.db.users_x_restaurants.update(rest.id, {
+            favorite: false,
+          });
         });
       }
     } catch (error) {
@@ -154,8 +160,8 @@ const registerRestaurantProcess = async (
 
   try {
     const relation: IUserRestaurant = {
-      id_restaurant: (response.restaurant.id)? response.restaurant.id : '',
-      id_user: (user.id)? user.id : '',
+      id_restaurant: response.restaurant.id ? response.restaurant.id : "",
+      id_user: user.id ? user.id : "",
       favorite,
     };
     await xata.db.users_x_restaurants.create(relation);

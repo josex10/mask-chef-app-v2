@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useSearchParams } from "next/navigation";
 import {
@@ -18,8 +18,6 @@ export const cutExpenseClave = (clave: string) => {
   return clave;
 };
 
-
-
 /**
  * @name useGetExpensesQueryParams
  * @category Expenses Helpers
@@ -37,32 +35,43 @@ export const cutExpenseClave = (clave: string) => {
  */
 export const useGetExpensesQueryParams = (): IExpenseQueryParams => {
   const searchParams = useSearchParams();
-  const startDate = convertAnyTypeToDateUnix(searchParams.get(EExpenseQueryParams.startDate));
-  const endDate = convertAnyTypeToDateUnix(searchParams.get(EExpenseQueryParams.endDate));
+  const startDate = convertAnyTypeToDateUnix(
+    searchParams.get(EExpenseQueryParams.startDate)
+  );
+  const endDate = convertAnyTypeToDateUnix(
+    searchParams.get(EExpenseQueryParams.endDate)
+  );
   const expenseId = searchParams.get(EExpenseQueryParams.expenseId) || null;
-  
+  const offset = parseInt(searchParams.get(EExpenseQueryParams.offset) || "0");
+
   return {
     startDate: getStartDateOfDateUnix(startDate),
     endDate: getEndDateOfDateUnix(endDate),
-    expenseId: expenseId,
+    expenseId,
+    offset,
   };
 };
 
-
-export const useGetExpenseTableQueryClientKey = (data: IExpenseQueryParams):any[] =>{
+export const useGetExpenseTableQueryClientKey = (
+  data: IExpenseQueryParams
+): any[] => {
   return [EQueryClientsKeys.expensesTable, data.startDate, data.endDate];
 };
 
-export const useGetSingleExpenseQueryClientKey = (data: IExpenseQueryParams):any[] =>{
+export const useGetSingleExpenseQueryClientKey = (
+  data: IExpenseQueryParams
+): any[] => {
   return [EQueryClientsKeys.singleExpense, data.expenseId];
 };
 
 export const generateExpensePath = (
   startDate: number,
   endDate: number,
-  expenseId: string | null
+  expenseId: string | null,
+  offset: number | null
 ): string => {
   let stringPath = "";
+
   if (startDate) {
     stringPath +=
       stringPath.length > 0
@@ -81,6 +90,10 @@ export const generateExpensePath = (
         : `?expenseId=${expenseId}`;
   }
 
+  if (offset) {
+    stringPath +=
+      stringPath.length > 0 ? `&offset=${offset}` : `?offset=${offset}`;
+  }
+
   return stringPath;
 };
-

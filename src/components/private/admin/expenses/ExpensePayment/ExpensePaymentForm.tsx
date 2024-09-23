@@ -43,7 +43,6 @@ const ExpensePaymentForm = () => {
   const handleAction = async (data: any) => {
     mutationExpenseAddPayment.mutate(data, {
       onSuccess: () => {
-        console.log("on success");
         handleDialog.closeDialog();
       },
     });

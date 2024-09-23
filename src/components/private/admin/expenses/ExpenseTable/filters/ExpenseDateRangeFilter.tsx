@@ -17,13 +17,14 @@ import {
   convertUnixToDate,
 } from "@/utils/helpers/dates";
 import { usePathname, useRouter } from "next/navigation";
-import { generateExpensePath, useGetExpensesQueryParams } from "@/utils/helpers/expenses";
+import {
+  generateExpensePath,
+  useGetExpensesQueryParams,
+} from "@/utils/helpers/expenses";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
-
-
 
 const validateUnitDates = (e: DateRange | undefined) => {
   if (!e || !e?.from || !e?.to) return;
@@ -46,6 +47,7 @@ export function ExpenseDateRangeFilter({
     startDate: startDateUnix,
     endDate: endDateUnix,
     expenseId,
+    offset,
   } = useGetExpensesQueryParams();
 
   const [date, setDate] = useState<DateRange | undefined>({
@@ -60,7 +62,8 @@ export function ExpenseDateRangeFilter({
     const newUrl = `${pathName}${generateExpensePath(
       unixValues.startDate,
       unixValues.endDate,
-      expenseId
+      expenseId,
+      offset
     )}`;
     routerPuskHook(newUrl).then(() => {
       queryClient.refetchQueries({
