@@ -31,6 +31,7 @@ const tables = [
       { column: "id_restaurant", table: "users_x_restaurants" },
       { column: "restaurant", table: "expenses" },
       { column: "restaurant", table: "providers" },
+      { column: "restaurant", table: "expenses_payment_type" },
     ],
   },
   {
@@ -89,6 +90,7 @@ const tables = [
       { column: "id_user", table: "users_x_restaurants" },
       { column: "createdBy", table: "expenses" },
       { column: "createdBy", table: "providers" },
+      { column: "payedBy", table: "expenses_payment_detail" },
     ],
   },
   {
@@ -127,22 +129,17 @@ const tables = [
         link: { table: "expenses_summary" },
         unique: true,
       },
+      { name: "isPaid", type: "bool", notNull: true, defaultValue: "false" },
+      {
+        name: "paymentExpirationDate",
+        type: "datetime",
+        notNull: true,
+        defaultValue: "now",
+      },
     ],
     revLinks: [
       { column: "expense", table: "expenses_line_detail" },
-      { column: "expense", table: "expenses_summary" },
-    ],
-  },
-  {
-    name: "expense_status",
-    columns: [
-      {
-        name: "name",
-        type: "text",
-        notNull: true,
-        defaultValue: "STATUS_NAME",
-      },
-      { name: "description", type: "text" },
+      { column: "expense", table: "expenses_payment_detail" },
     ],
   },
   {
@@ -256,7 +253,6 @@ const tables = [
         notNull: true,
         defaultValue: "0",
       },
-      { name: "expense", type: "link", link: { table: "expenses" } },
     ],
     revLinks: [{ column: "expenseSummary", table: "expenses" }],
   },
@@ -313,6 +309,34 @@ const tables = [
       { name: "Cantidad", type: "float", notNull: true, defaultValue: "1" },
     ],
   },
+  {
+    name: "expenses_payment_detail",
+    columns: [
+      { name: "expense", type: "link", link: { table: "expenses" } },
+      {
+        name: "payment_type",
+        type: "link",
+        link: { table: "expenses_payment_type" },
+      },
+      { name: "referenceNumber", type: "text", defaultValue: "" },
+      { name: "notes", type: "text" },
+      { name: "payedBy", type: "link", link: { table: "users" } },
+    ],
+  },
+  {
+    name: "expenses_payment_type",
+    columns: [
+      {
+        name: "type",
+        type: "text",
+        notNull: true,
+        defaultValue: "SYSTEM_TYPE",
+      },
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+      { name: "description", type: "text" },
+    ],
+    revLinks: [{ column: "payment_type", table: "expenses_payment_detail" }],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -333,9 +357,6 @@ export type UsersRecord = Users & XataRecord;
 export type Expenses = InferredTypes["expenses"];
 export type ExpensesRecord = Expenses & XataRecord;
 
-export type ExpenseStatus = InferredTypes["expense_status"];
-export type ExpenseStatusRecord = ExpenseStatus & XataRecord;
-
 export type Providers = InferredTypes["providers"];
 export type ProvidersRecord = Providers & XataRecord;
 
@@ -345,16 +366,23 @@ export type ExpensesSummaryRecord = ExpensesSummary & XataRecord;
 export type ExpensesLineDetail = InferredTypes["expenses_line_detail"];
 export type ExpensesLineDetailRecord = ExpensesLineDetail & XataRecord;
 
+export type ExpensesPaymentDetail = InferredTypes["expenses_payment_detail"];
+export type ExpensesPaymentDetailRecord = ExpensesPaymentDetail & XataRecord;
+
+export type ExpensesPaymentType = InferredTypes["expenses_payment_type"];
+export type ExpensesPaymentTypeRecord = ExpensesPaymentType & XataRecord;
+
 export type DatabaseSchema = {
   restaurants: RestaurantsRecord;
   countries: CountriesRecord;
   users_x_restaurants: UsersXRestaurantsRecord;
   users: UsersRecord;
   expenses: ExpensesRecord;
-  expense_status: ExpenseStatusRecord;
   providers: ProvidersRecord;
   expenses_summary: ExpensesSummaryRecord;
   expenses_line_detail: ExpensesLineDetailRecord;
+  expenses_payment_detail: ExpensesPaymentDetailRecord;
+  expenses_payment_type: ExpensesPaymentTypeRecord;
 };
 
 const DatabaseClient = buildClient();

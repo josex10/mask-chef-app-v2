@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 
 import { useForm } from "react-hook-form";
@@ -14,15 +14,23 @@ import { createExpenseFromXml } from "@/lib/actions/private/admin/expenses/Uploa
 import useStoreAuth from "@/store/private/admin/auth";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import {
+  generateExpensePath,
+  useGetExpensesQueryParams,
+} from "@/utils/helpers/expenses";
+import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
+import { useQueryClient } from "@tanstack/react-query";
+import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
+import { checkIfADateIsBetweenTwoDates } from "@/utils/helpers/dates";
+import { convertUnixToDate } from "../../../../../utils/helpers/dates";
 
 const UploadExpenseBtn = () => {
-
-  const searchParams = useSearchParams();
-  const router = useRouter();
   const pathName = usePathname();
-  const startDate = searchParams.get("startDate");
-  const endDate = searchParams.get("endDate");
-  
+  const routerPuskHook = useRouterPush();
+  const queryClient = useQueryClient();
+
+  const { startDate, endDate, offset } = useGetExpensesQueryParams();
+
   const { handleSubmit } = useForm();
 
   const [file, setFile] = useState<File | null>(null);
@@ -71,7 +79,9 @@ const UploadExpenseBtn = () => {
             toast.error(xmlResponse.message);
             setIsLoading(false);
           } else {
-            (xmlResponse.expenseId) && handleOnClick(xmlResponse.expenseId);
+            if (xmlResponse.expenseId && xmlResponse.expenseDate) {
+              handleOnClick(xmlResponse.expenseId, xmlResponse.expenseDate);
+            }
             toast.success(xmlResponse.message);
             setIsLoading(false);
             setFile(null);
@@ -81,14 +91,32 @@ const UploadExpenseBtn = () => {
     };
   };
 
-  const handleOnClick = (expenseId: string) => {
-    if (startDate || endDate) {
-      router.push(
-        `${pathName}?startDate=${startDate}&endDate=${endDate}&expenseId=${expenseId}`,
-        { scroll: false }
+  const handleOnClick = (expenseId: string, expenseDate: Date) => {
+    const newUrl = `${pathName}${generateExpensePath(
+      startDate,
+      endDate,
+      expenseId, 
+      offset
+    )}`;
+    routerPuskHook(newUrl).then(() => {
+      const needRefetch = checkIfADateIsBetweenTwoDates(
+        expenseDate,
+        convertUnixToDate(startDate),
+        convertUnixToDate(endDate)
       );
-    }
-    router.push(`${pathName}?expenseId=${expenseId}`, { scroll: false });
+
+      if (needRefetch) {
+        queryClient.refetchQueries({
+          queryKey: [EQueryClientsKeys.expensesTable],
+        });
+        queryClient.refetchQueries({
+          queryKey: [EQueryClientsKeys.expensesFinantialInfo],
+        });
+      }
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.singleExpense],
+      });
+    });
   };
 
   return (

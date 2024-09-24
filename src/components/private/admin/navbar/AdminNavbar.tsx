@@ -1,25 +1,31 @@
-import { redirect } from "next/navigation";
+"use client";
 
 import AdminNavbarSheetComponent from "./AdminNavbarSheet";
 import SharedDropdownTheme from "@/components/shared/SharedDropdownTheme";
-import { getCookie } from "@/lib/middleware/cookies";
-import AdminNavbarStore from "./AdminNavbarStore";
 import AdminNavbarRestName from "./AdminNavbarRestName";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-const AdminNavbarComponent = async () => {
-  const cookie = await getCookie();
-  if (!cookie) {
-    redirect("/sign-out");
-  }
+import IAuthProfile from "@/utils/interfaces/private/admin/profile";
+import useStoreAuth from "@/store/private/admin/auth";
+import { useEffect } from "react";
+type TAdminNavbarComponent = {
+  cookie: IAuthProfile;
+};
+
+const AdminNavbarComponent = ({ cookie }: TAdminNavbarComponent) => {
+  const { login } = useStoreAuth((state) => state);
+
+  useEffect(() => {
+    login(cookie);
+  }, [login, cookie]);
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted px-4 lg:h-[60px] lg:px-6 sticky top-0 z-50">
-      <AdminNavbarStore cookie={cookie} />
       <AdminNavbarSheetComponent />
       <div className="flex-1"></div>
       <div className="flex flex-row gap-4">
         <AdminNavbarRestName />
         <SignedIn>
-          <UserButton/>
+          <UserButton />
         </SignedIn>
 
         <SharedDropdownTheme />

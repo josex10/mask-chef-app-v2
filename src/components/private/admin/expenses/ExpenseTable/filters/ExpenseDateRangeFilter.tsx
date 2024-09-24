@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { CalendarX } from "lucide-react";
@@ -15,24 +14,66 @@ import {
 import {
   checkIfUnixDateIsValid,
   converDateToUnix,
+  convertUnixToDate,
 } from "@/utils/helpers/dates";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { getStartAndEndDateBasedOnDateString } from "@/utils/helpers/expenses";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  generateExpensePath,
+  useGetExpensesQueryParams,
+} from "@/utils/helpers/expenses";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
+import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
+
+const validateUnitDates = (e: DateRange | undefined) => {
+  if (!e || !e?.from || !e?.to) return;
+  const startDate = converDateToUnix(e.from);
+  if (!checkIfUnixDateIsValid(startDate)) return null;
+  const endDate = converDateToUnix(e.to);
+  if (!checkIfUnixDateIsValid(endDate)) return null;
+
+  return { startDate, endDate };
+};
 
 export function ExpenseDateRangeFilter({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const router = useRouter();
   const pathName = usePathname();
-  const searchParams = useSearchParams();
-  const expenseId = searchParams.get("expenseId");
+  const queryClient = useQueryClient();
+  const routerPuskHook = useRouterPush();
 
-  const { startDate, endDate } = getStartAndEndDateBasedOnDateString(searchParams.get("startDate"), searchParams.get("endDate"));
+  const {
+    startDate: startDateUnix,
+    endDate: endDateUnix,
+    expenseId,
+    offset,
+  } = useGetExpensesQueryParams();
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: startDate,
-    to: endDate,
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: convertUnixToDate(startDateUnix),
+    to: convertUnixToDate(endDateUnix),
   });
+
+  const updateQuery = async (e: DateRange | undefined) => {
+    const unixValues = validateUnitDates(e);
+    if (!unixValues) return;
+
+    const newUrl = `${pathName}${generateExpensePath(
+      unixValues.startDate,
+      unixValues.endDate,
+      expenseId,
+      offset
+    )}`;
+    routerPuskHook(newUrl).then(() => {
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.expensesTable],
+      });
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.expensesFinantialInfo],
+      });
+    });
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -68,18 +109,8 @@ export function ExpenseDateRangeFilter({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(e) => {
-
               setDate(e);
-              if (!e || !e?.from || !e?.to) return;
-
-              const startDate = converDateToUnix(e.from);
-              if (!checkIfUnixDateIsValid(startDate)) return;
-              const endDate = converDateToUnix(e.to);
-              if (!checkIfUnixDateIsValid(endDate)) return;
-              router.push(
-                `${pathName}?startDate=${startDate}&endDate=${endDate}${expenseId && `&expenseId=${expenseId}`}`,
-                { scroll: false }
-              );
+              updateQuery(e);
             }}
             numberOfMonths={2}
           />

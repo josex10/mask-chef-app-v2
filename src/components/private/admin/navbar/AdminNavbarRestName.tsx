@@ -5,13 +5,13 @@ import useStoreAuth from "@/store/private/admin/auth";
 import { Store } from "lucide-react";
 
 const AdminNavbarRestName = () => {
-  const restaurantSelected = useStoreAuth((state) => state.selectedRestaurant);
+  const {selectedRestaurant} = useStoreAuth((state) => state);
   return (
     <CardTitle className="flex flex-col justify-center items-center text-sm">
       <div className="hidden lg:block">
         <div className="flex flex-row justify-center items-center gap-2">
           <Store />
-          {restaurantSelected?.name}
+          {selectedRestaurant?.name && <p>{selectedRestaurant.name}</p>}
         </div>
       </div>
     </CardTitle>

@@ -21,7 +21,7 @@ const DashboardCardComponent = ({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{mainTxt}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <span className="text-xs text-muted-foreground">{description}</span>
       </CardContent>
     </Card>
   );

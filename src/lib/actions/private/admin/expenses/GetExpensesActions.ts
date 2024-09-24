@@ -8,14 +8,15 @@ import {
 } from "@/utils/helpers/dates";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
-import { IExpenseFilter } from "@/utils/interfaces/private/admin/expenseFilter";
+import { IExpenseQueryParams } from "@/utils/interfaces/private/admin/expenseQueryParams";
+import { IPaginationOutput } from "@/utils/interfaces/private/admin/paginationOutput";
+import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { getXataClient } from "@/xata";
 
 const xata = getXataClient();
 
 export const getAllExpenses = async (
-  filter: IExpenseFilter,
-  offset: number = 0
+  filter: IExpenseQueryParams
 ): Promise<string | null> => {
   try {
     const resutaurantSelected = await getSelectedRestaurantFromCookie();
@@ -27,8 +28,12 @@ export const getAllExpenses = async (
       throw new Error("Invalid start date");
     }
 
-    const {start} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.startDate));
-    const {end} = getStardAndEndDateOfTheDay(convertUnixToDate(filter.endDate));
+    const { start } = getStardAndEndDateOfTheDay(
+      convertUnixToDate(filter.startDate)
+    );
+    const { end } = getStardAndEndDateOfTheDay(
+      convertUnixToDate(filter.endDate)
+    );
 
     const expenses = await xata.db.expenses
       .select([
@@ -36,6 +41,8 @@ export const getAllExpenses = async (
         "clave",
         "fechaEmision",
         "provider.name",
+        "paymentExpirationDate",
+        "isPaid",
         "expenseSummary.TotalComprobante",
       ])
       .filter({
@@ -49,22 +56,42 @@ export const getAllExpenses = async (
           },
         ],
       })
-      .sort("fechaEmision", "desc")
-      .getAll();
+      .sort("fechaEmision", "asc")
+      .getPaginated({ pagination: { offset: filter.offset } });
 
     if (!expenses) return null;
-    const result: IGroupExpenseTable[] = expenses.map((expense) => {
+    const result: IGroupExpenseTable[] = expenses.records.map((expense) => {
       return {
         id: expense.id,
         clave: expense.clave,
         fechaEmision: expense.fechaEmision,
         providerName: expense.provider?.name || "",
+        paymentExpirationDate: expense.paymentExpirationDate,
+        isPaid: expense.isPaid,
         totalComprobante: expense.expenseSummary?.TotalComprobante || 0,
       };
     });
-    return JSON.stringify(result);
-  } catch (error) {
-    return null;
+
+    const dataOuput: IPaginationOutput = {
+      data: result,
+      pagination: {
+        hasNextPage: expenses.hasNextPage(),
+      }
+    };
+  
+    const finalOutput: IServerActionResponse = {
+      error: false,
+      message: "Expenses fetched successfully",
+      data: dataOuput,
+    };
+    return JSON.stringify(finalOutput);
+  } catch (error: any) {
+    const response: IServerActionResponse = {
+      error: true,
+      message: error.message ? error.message : "Ha ocurrido un error al procesar la solicitud.",
+      data: null,
+    };
+    return JSON.stringify(response);
   }
 };
 
@@ -79,7 +106,9 @@ export const getSingleExpense = async (
         "clave",
         "fechaEmision",
         "numeroConsecutivo",
+        "paymentExpirationDate",
         "createdBy.email",
+        "expenseSummary.id",
         "expenseSummary.TotalVenta",
         "expenseSummary.TotalDescuentos",
         "expenseSummary.TotalImpuesto",
@@ -88,6 +117,7 @@ export const getSingleExpense = async (
         "provider.phone",
         "provider.email",
         "provider.comercialName",
+        "isPaid",
         "xata.createdAt",
       ])
       .filter({
@@ -104,12 +134,28 @@ export const getSingleExpense = async (
       })
       .getAll();
 
+    const expensePaymentDetails = await xata.db.expenses_payment_detail
+      .select([
+        "id",
+        "payment_type.type",
+        "referenceNumber",
+        "notes",
+        "payedBy.email",
+        "xata.createdAt",
+      ])
+      .filter({
+        expense: expenseId,
+      })
+      .getFirst();
+
     const result: ICustomSingleExpense = {
       id: expense.id,
       clave: expense.clave,
       fechaEmision: expense.fechaEmision,
       numeroConsecutivo: expense.numeroConsecutivo,
+      paymentExpirationDate: expense.paymentExpirationDate,
       createdByEmail: expense.createdBy?.email || null,
+      expenseSummaryId: expense.expenseSummary?.id || "",
       expenseSummaryTotalVenta: expense.expenseSummary?.TotalVenta || 0,
       expenseSummaryTotalDescuentos:
         expense.expenseSummary?.TotalDescuentos || 0,
@@ -130,6 +176,17 @@ export const getSingleExpense = async (
           SubTotal: detail.SubTotal,
         };
       }),
+      isPaid: expense.isPaid,
+      paymentDetail: !expensePaymentDetails
+        ? null
+        : {
+            id: expensePaymentDetails.id || "",
+            paymentTypeType: expensePaymentDetails.payment_type?.type || "",
+            referenceNumber: expensePaymentDetails.referenceNumber || "",
+            notes: expensePaymentDetails.notes || "",
+            createdAt: expensePaymentDetails.xata.createdAt,
+            payedBy: expensePaymentDetails.payedBy?.email || "",
+          },
     };
     return result ? JSON.stringify(result) : null;
   } catch (error) {
