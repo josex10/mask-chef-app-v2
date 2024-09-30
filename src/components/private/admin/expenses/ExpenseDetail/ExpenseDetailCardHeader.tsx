@@ -2,12 +2,12 @@
 
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { cutExpenseClave } from "@/utils/helpers/expenses";
 import { Badge } from "@/components/ui/badge";
 import { ICustomSingleExpense } from "@/utils/interfaces/private/admin/customSingleExpense";
 import { ExpensePaymentDialog } from "../ExpensePayment/ExpensePaymentDialog";
 import { ExpenseDetailDeleteExpenseDialog } from "./ExpenseDetailDeleteExpenseDialog";
 import ExpenseDetailDateInput from "./ExpenseDetailDateInput";
+import { useCutExpenseClave } from "@/lib/hooks/expenses/expenses";
 
 const ExpenseDetailCardHeader = ({
   clave,
@@ -17,6 +17,7 @@ const ExpenseDetailCardHeader = ({
   id,
   paymentExpirationDate
 }: ICustomSingleExpense) => {
+  const cutClave = useCutExpenseClave(clave || "");
   return (
     <div className="sticky top-0 z-10 bg-background">
       <CardHeader className="flex flex-row items-start bg-muted/50 w-full ">
@@ -34,7 +35,7 @@ const ExpenseDetailCardHeader = ({
           <Separator className="my-2" />
           <CardDescription className="flex flex-row justify-between">
             <span className="font-bold">Clave: </span>
-            <span>{cutExpenseClave(clave)}</span>
+            <span>{cutClave}</span>
           </CardDescription>
           <div className="flex flex-row justify-between items-center">
             <CardDescription >

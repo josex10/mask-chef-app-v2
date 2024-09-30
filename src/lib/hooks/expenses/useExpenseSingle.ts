@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 import { getSingleExpense } from "@/lib/actions/private/admin/expenses/GetExpensesActions";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
-import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { useQuery } from "@tanstack/react-query";
-
+import { useHandleExpenseParams } from "./useExpenseHandleQueryParams";
 
 export const useGetExpenseSingleData = () => {
-  const {expenseId} = useGetExpensesQueryParams();
+  const { getActualParams } = useHandleExpenseParams();
+  const { expenseId } = getActualParams;
 
   return useQuery<string | null>({
     queryKey: [EQueryClientsKeys.singleExpense],
