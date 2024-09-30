@@ -29,7 +29,7 @@ const ExpenseDetailPaymentSection = ({
                 <NotebookPen className="h-4 w-4" />
                 Notas
               </dt>
-              <dd>{notes}</dd>
+              <dd className="text-right">{notes}</dd>
             </div>
           )}
 

@@ -3,42 +3,35 @@
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
+import { useCutExpenseClave } from "@/lib/hooks/expenses/expenses";
+import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
+import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 import {
   checkIfDateIsBeforeToday,
   convertDateToStandard,
 } from "@/utils/helpers/dates";
-import {
-  cutExpenseClave,
-  generateExpensePath,
-  useGetExpensesQueryParams,
-} from "@/utils/helpers/expenses";
 import { IGroupExpenseTable } from "@/utils/interfaces/private/admin/customGroupExpenseTable";
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
 
 type TCardExpenseProp = {
   expense: IGroupExpenseTable;
+  showCreatedAt: boolean;
 };
 
-const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
-  const pathName = usePathname();
-  const { startDate, endDate, expenseId, offset } = useGetExpensesQueryParams();
-  const routerPuskHook = useRouterPush();
+const CardExpenseTableRow = ({ expense, showCreatedAt }: TCardExpenseProp) => {
   const queryClient = useQueryClient();
+  const { getActualParams, useSetActualParams } = useHandleExpenseParams();
+  const cutClave = useCutExpenseClave(expense.clave || "");
 
   if (!expense) return;
 
-  const handleOnClick = () => {
-    const newUrl = `${pathName}${generateExpensePath(
-      startDate,
-      endDate,
-      expense.id, 
-      offset
-    )}`;
-    routerPuskHook(newUrl).then(() => {
-      if (expenseId === expense.id) return;
+  const useHandleOnClick = () => {
+    useSetActualParams([
+      { key: EExpenseQueryParams.expenseId, value: expense.id },
+    ]).then(() => {
+      if (getActualParams.expenseId === expense.id) return;
+
       queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });
@@ -46,16 +39,18 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
   };
 
   const selectedClass =
-    expenseId && expense.id === expenseId ? "bg-muted/40" : "";
+    getActualParams.expenseId && expense.id === getActualParams.expenseId
+      ? "bg-muted/40"
+      : "";
 
   const isOverdue = checkIfDateIsBeforeToday(expense.paymentExpirationDate);
 
   return (
-    <TableRow onClick={handleOnClick} className={selectedClass}>
+    <TableRow onClick={useHandleOnClick} className={selectedClass}>
       <TableCell className="w-[30vw] ">
         <div className="font-medium">{expense.providerName}</div>
         <div className="hidden text-sm text-muted-foreground md:inline">
-          {cutExpenseClave(expense.clave)}
+          {cutClave}
         </div>
       </TableCell>
       <TableCell className="hidden sm:table-cell">
@@ -73,7 +68,9 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
         )}
       </TableCell>
       <TableCell className="hidden sm:table-cell">
-        {convertDateToStandard(String(expense.fechaEmision))}
+        {showCreatedAt
+          ? convertDateToStandard(String(expense.createdAt))
+          : convertDateToStandard(String(expense.fechaEmision))}
       </TableCell>
       <TableCell className="font-medium">
         <TextFieldForCurrency totalAmount={expense.totalComprobante} />

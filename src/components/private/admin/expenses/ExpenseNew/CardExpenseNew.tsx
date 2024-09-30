@@ -5,23 +5,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import UploadExpenseBtn from "./UploadExpenseBtn";
+import { Button } from "@/components/ui/button";
 
-const CardExpenseUpload = () => {
+const CardExpenseNew = () => {
   return (
     <Card className="sm:col-span-2 md:h-[20vh]" x-chunk="dashboard-05-chunk-0">
       <CardHeader className="pb-3">
-        <CardTitle>Importar <span className="text-sm text-muted">Válido solo para CRC.</span></CardTitle>
+        <CardTitle>Nuevo</CardTitle>
         <CardDescription className="max-w-lg text-balance leading-relaxed">
-          Importa sus gastos fácilmente al sistema, subiendo el archivo XML
-          emitido por Hacienda. 
+          Esta opción le permite agregar un nuevo gasto al sistema de manera detallada.
         </CardDescription>
       </CardHeader>
       <CardFooter>
-        <UploadExpenseBtn />
+        <Button>Agregar</Button>
       </CardFooter>
     </Card>
   );
 };
 
-export default CardExpenseUpload;
+export default CardExpenseNew;

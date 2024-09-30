@@ -1,38 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
-
 import { useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { createExpenseFromXml } from "@/lib/actions/private/admin/expenses/UploadExpenseActions";
-
 import useStoreAuth from "@/store/private/admin/auth";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import {
-  generateExpensePath,
-  useGetExpensesQueryParams,
-} from "@/utils/helpers/expenses";
-import { useRouterPush } from "@/lib/hooks/shared/useRouterPush";
 import { useQueryClient } from "@tanstack/react-query";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
-import { checkIfADateIsBetweenTwoDates } from "@/utils/helpers/dates";
-import { convertUnixToDate } from "../../../../../utils/helpers/dates";
+import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
+import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 
 const UploadExpenseBtn = () => {
-  const pathName = usePathname();
-  const routerPuskHook = useRouterPush();
   const queryClient = useQueryClient();
-
-  const { startDate, endDate, offset } = useGetExpensesQueryParams();
-
+  const { useSetActualParams } = useHandleExpenseParams();
   const { handleSubmit } = useForm();
-
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const restaurantSelected = useStoreAuth((state) => state.selectedRestaurant);
@@ -80,7 +66,8 @@ const UploadExpenseBtn = () => {
             setIsLoading(false);
           } else {
             if (xmlResponse.expenseId && xmlResponse.expenseDate) {
-              handleOnClick(xmlResponse.expenseId, xmlResponse.expenseDate);
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useHandleOnClick(xmlResponse.expenseId);
             }
             toast.success(xmlResponse.message);
             setIsLoading(false);
@@ -91,28 +78,14 @@ const UploadExpenseBtn = () => {
     };
   };
 
-  const handleOnClick = (expenseId: string, expenseDate: Date) => {
-    const newUrl = `${pathName}${generateExpensePath(
-      startDate,
-      endDate,
-      expenseId, 
-      offset
-    )}`;
-    routerPuskHook(newUrl).then(() => {
-      const needRefetch = checkIfADateIsBetweenTwoDates(
-        expenseDate,
-        convertUnixToDate(startDate),
-        convertUnixToDate(endDate)
-      );
+  const useHandleOnClick = (expenseId: string) => {
+    useSetActualParams([
+      { key: EExpenseQueryParams.expenseId, value: expenseId },
+    ]).then(() => {
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.expensesTableLastCreated],
+      });
 
-      if (needRefetch) {
-        queryClient.refetchQueries({
-          queryKey: [EQueryClientsKeys.expensesTable],
-        });
-        queryClient.refetchQueries({
-          queryKey: [EQueryClientsKeys.expensesFinantialInfo],
-        });
-      }
       queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });

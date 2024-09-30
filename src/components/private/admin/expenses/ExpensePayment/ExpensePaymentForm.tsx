@@ -17,10 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useExpenseAddPayment } from "@/lib/hooks/expenses/useExpenseAddPayment";
+import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
 import { useGetExpensePaymentData } from "@/lib/hooks/expenses/useExpensePaymentType";
 import useStoreAuth from "@/store/private/admin/auth";
 import useStoreExpenseDetailPaymentDialog from "@/store/private/expenses/storeExpenseDetailPaymentDialog";
-import { useGetExpensesQueryParams } from "@/utils/helpers/expenses";
 import { IExpensePaymentType } from "@/utils/interfaces/private/admin/expensePaymentType";
 import { ExpensePaymentDetailSchema } from "@/utils/schemas/private/ExpensePaymentDetailSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +29,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const ExpensePaymentForm = () => {
-  const { expenseId } = useGetExpensesQueryParams();
+  const { getActualParams } = useHandleExpenseParams();
+  const { expenseId } = getActualParams;
   const handleDialog = useStoreExpenseDetailPaymentDialog();
   const userLogged = useStoreAuth((state) => state.user);
 

@@ -80,7 +80,7 @@ const CardExpenseDetail = () => {
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-muted-foreground">Correo</dt>
-              <dd>
+              <dd className="text-right">
                 <a href="mailto:">{expenseData.providerEmail}</a>
               </dd>
             </div>

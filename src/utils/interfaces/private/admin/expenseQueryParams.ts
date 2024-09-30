@@ -1,6 +1,8 @@
 export type IExpenseQueryParams = {
-  startDate: number;
-  endDate: number;
-  expenseId: string | null;
-  offset: number;
+  startDate: string | null;
+  endDate: string | null;
+  dateType: string | null;
+  expenseKey: string | null;
+  expenseStatus: string | null;
+  providerId: string | null;
 };
