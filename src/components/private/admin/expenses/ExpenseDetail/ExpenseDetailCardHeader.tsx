@@ -15,7 +15,7 @@ const ExpenseDetailCardHeader = ({
   isPaid,
   expenseSummaryId,
   id,
-  paymentExpirationDate
+  paymentExpirationDate,
 }: ICustomSingleExpense) => {
   const cutClave = useCutExpenseClave(clave || "");
   return (
@@ -25,7 +25,8 @@ const ExpenseDetailCardHeader = ({
           <CardTitle className="flex flex-row justify-between items-center">
             <span>Detalle del Gasto</span>
             <div className="flex flex-row gap-2">
-              <ExpensePaymentDialog />
+              {!isPaid && <ExpensePaymentDialog />}
+
               <ExpenseDetailDeleteExpenseDialog
                 expenseId={id}
                 expenseSummaryId={expenseSummaryId}
@@ -38,17 +39,25 @@ const ExpenseDetailCardHeader = ({
             <span>{cutClave}</span>
           </CardDescription>
           <div className="flex flex-row justify-between items-center">
-            <CardDescription >
+            <CardDescription>
               <span className="font-bold">Fecha de Emisión: </span>
             </CardDescription>
-            <ExpenseDetailDateInput expenseId={id}  isDisabled={true} initialDate={fechaEmision}/>
+            <ExpenseDetailDateInput
+              expenseId={id}
+              isDisabled={true}
+              initialDate={fechaEmision}
+            />
           </div>
 
           <div className="flex flex-row justify-between items-center">
             <CardDescription>
               <span className="font-bold">Fecha de Vencimiento: </span>
             </CardDescription>
-            <ExpenseDetailDateInput expenseId={id} isDisabled={isPaid} initialDate={paymentExpirationDate}/>
+            <ExpenseDetailDateInput
+              expenseId={id}
+              isDisabled={isPaid}
+              initialDate={paymentExpirationDate}
+            />
           </div>
 
           <div className="flex flex-row justify-end">
