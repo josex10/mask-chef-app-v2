@@ -5,7 +5,6 @@ export enum EExpenseFilterDateType {
 }
 
 export enum EStatus {
-  none = "none",
   payed = "Pagado",
   pending = "Pendiente",
 }

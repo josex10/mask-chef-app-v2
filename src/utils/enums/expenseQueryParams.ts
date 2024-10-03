@@ -6,4 +6,5 @@ export enum EExpenseQueryParams {
     expenseKey = 'expenseKey',
     expenseStatus = 'expenseStatus',
     providerId= 'providerId',
+    expenseTab = 'expenseTab'
 }

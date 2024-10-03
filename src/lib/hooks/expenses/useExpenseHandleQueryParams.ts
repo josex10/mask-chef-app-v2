@@ -22,61 +22,8 @@ const useGetExpenseActualParameters = (
     expenseKey: searchParams.get(EExpenseQueryParams.expenseKey),
     expenseStatus: searchParams.get(EExpenseQueryParams.expenseStatus),
     providerId: searchParams.get(EExpenseQueryParams.providerId),
+    expenseTab: searchParams.get(EExpenseQueryParams.expenseTab),
   };
-};
-
-const useSetParams = async (
-  params: THandleExpenseFilters[],
-  remove: boolean,
-  pathName: string,
-  getActualParams: any,
-  routerPush: any
-) => {
-  let {
-    startDate,
-    endDate,
-    expenseId,
-    dateType,
-    expenseKey,
-    expenseStatus,
-    providerId,
-  } = getActualParams;
-
-  params.forEach((param) => {
-    if (param.key === EExpenseQueryParams.startDate) {
-      startDate = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.endDate) {
-      endDate = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.expenseId) {
-      expenseId = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.dateType) {
-      dateType = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.expenseKey) {
-      expenseKey = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.expenseStatus) {
-      expenseStatus = remove ? null : param.value;
-    }
-    if (param.key === EExpenseQueryParams.providerId) {
-      providerId = remove ? null : param.value;
-    }
-  });
-
-  await routerPush(
-    `${pathName}${getUrl(
-      startDate,
-      endDate,
-      expenseId,
-      dateType,
-      expenseKey,
-      expenseStatus,
-      providerId
-    )}`
-  );
 };
 
 const getUrl = (
@@ -86,7 +33,8 @@ const getUrl = (
   dateType: string | null,
   expenseKey: string | null,
   expenseStatus: string | null,
-  providerId: string | null
+  providerId: string | null,
+  expenseTab: string | null
 ) => {
   let stringPath = "";
   if (startDate && startDate !== "") {
@@ -133,7 +81,73 @@ const getUrl = (
         : `?providerId=${providerId}`;
   }
 
+  if (expenseTab && expenseTab !== "") {
+    stringPath +=
+      stringPath.length > 0
+        ? `&expenseTab=${expenseTab}`
+        : `?expenseTab=${expenseTab}`;
+  }
+
   return stringPath;
+};
+
+const fnInternalSetParams = async (
+  params: THandleExpenseFilters[],
+  remove: boolean,
+  pathName: string,
+  getActualParams: any,
+  routerPush: any
+) => {
+  let {
+    startDate,
+    endDate,
+    expenseId,
+    dateType,
+    expenseKey,
+    expenseStatus,
+    providerId,
+    expenseTab,
+  } = getActualParams;
+
+  params.forEach((param) => {
+    if (param.key === EExpenseQueryParams.startDate) {
+      startDate = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.endDate) {
+      endDate = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.expenseId) {
+      expenseId = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.dateType) {
+      dateType = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.expenseKey) {
+      expenseKey = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.expenseStatus) {
+      expenseStatus = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.providerId) {
+      providerId = remove ? null : param.value;
+    }
+    if (param.key === EExpenseQueryParams.expenseTab) {
+      expenseTab = remove ? null : param.value;
+    }
+  });
+
+  await routerPush(
+    `${pathName}${getUrl(
+      startDate,
+      endDate,
+      expenseId,
+      dateType,
+      expenseKey,
+      expenseStatus,
+      providerId,
+      expenseTab
+    )}`
+  );
 };
 
 export const useHandleExpenseParams = () => {
@@ -142,10 +156,18 @@ export const useHandleExpenseParams = () => {
   const pathName = usePathname();
   const getActualParams = useGetExpenseActualParameters(searchParams);
 
-  const useSetActualParams = (
+  async function fnSetParams(
     filters: THandleExpenseFilters[],
     remove: boolean = false
-  ) => useSetParams(filters, remove, pathName, getActualParams, routerPush);
+  ) {
+    await fnInternalSetParams(
+      filters,
+      remove,
+      pathName,
+      getActualParams,
+      routerPush
+    );
+  }
 
-  return { getActualParams, useSetActualParams };
+  return { getActualParams, fnSetParams };
 };

@@ -13,15 +13,17 @@ const ExpenseTabSearch = () => {
 
   return (
     <>
-      <ExpenseFilterWrapper />
       {isLoading || isFetching ? (
         <SkeletonTable />
       ) : (
-        <CardExpenseTable
-          showCreatedAt={true}
-          data={data}
-          header={headerDescription}
-        />
+        <>
+          <ExpenseFilterWrapper />
+          <CardExpenseTable
+            showCreatedAt={true}
+            data={data}
+            header={headerDescription}
+          />
+        </>
       )}
     </>
   );

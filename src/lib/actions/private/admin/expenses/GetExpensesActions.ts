@@ -136,7 +136,6 @@ export const getAllExpenses = async (
       })
       .sort("fechaEmision", "asc")
       .getAll();
-
     if (!expenses) return null;
     const result: IGroupExpenseTable[] = expenses.map((expense) => {
       return {

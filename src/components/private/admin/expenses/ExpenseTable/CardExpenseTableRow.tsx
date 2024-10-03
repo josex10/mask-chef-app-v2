@@ -21,13 +21,13 @@ type TCardExpenseProp = {
 
 const CardExpenseTableRow = ({ expense, showCreatedAt }: TCardExpenseProp) => {
   const queryClient = useQueryClient();
-  const { getActualParams, useSetActualParams } = useHandleExpenseParams();
+  const { getActualParams, fnSetParams } = useHandleExpenseParams();
   const cutClave = useCutExpenseClave(expense.clave || "");
 
   if (!expense) return;
 
   const useHandleOnClick = () => {
-    useSetActualParams([
+    fnSetParams([
       { key: EExpenseQueryParams.expenseId, value: expense.id },
     ]).then(() => {
       if (getActualParams.expenseId === expense.id) return;
