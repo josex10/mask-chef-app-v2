@@ -5,6 +5,8 @@ import { CirclePlus, Landmark, Search } from "lucide-react";
 import ExpenseTabNew from "./ExpenseTabNew";
 import ExpenseTabHacienda from "./ExpenseTabHacienda";
 import ExpenseTabSearch from "./ExpenseTabSearch";
+import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
+import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 
 enum ExpenseTabsEnum {
   NEW = "new",
@@ -34,10 +36,18 @@ const ExpenseTabsItems = [
 ];
 
 const ExpenseTabsList = () => {
+  const { fnSetParams } = useHandleExpenseParams();
+  function handleClick(value: ExpenseTabsEnum) {
+    fnSetParams([{ key: EExpenseQueryParams.expenseTab, value }]);
+  }
   return (
     <TabsList>
       {ExpenseTabsItems.map(({ value, icon, label }) => (
-        <TabsTrigger key={value} value={value}>
+        <TabsTrigger
+          key={value}
+          value={value}
+          onClick={() => handleClick(value)}
+        >
           {icon}
           {label}
         </TabsTrigger>
@@ -59,8 +69,11 @@ const ExpenseTabsContent = () => {
 };
 
 const ExpenseTabs = () => {
+  const { getActualParams } = useHandleExpenseParams();
+  const { expenseTab: expenseTabParams } = getActualParams;
+  const defaultTab = expenseTabParams || ExpenseTabsEnum.NEW;
   return (
-    <Tabs defaultValue={ExpenseTabsEnum.NEW}>
+    <Tabs defaultValue={defaultTab}>
       <ExpenseTabsList />
       <ExpenseTabsContent />
     </Tabs>

@@ -17,7 +17,7 @@ import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 
 const UploadExpenseBtn = () => {
   const queryClient = useQueryClient();
-  const { useSetActualParams } = useHandleExpenseParams();
+  const { fnSetParams } = useHandleExpenseParams();
   const { handleSubmit } = useForm();
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +79,7 @@ const UploadExpenseBtn = () => {
   };
 
   const useHandleOnClick = (expenseId: string) => {
-    useSetActualParams([
+    fnSetParams([
       { key: EExpenseQueryParams.expenseId, value: expenseId },
     ]).then(() => {
       queryClient.refetchQueries({
