@@ -7,28 +7,24 @@ import ExpenseTabHacienda from "./ExpenseTabHacienda";
 import ExpenseTabSearch from "./ExpenseTabSearch";
 import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
 import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
+import { EExpenseTabs } from "@/utils/enums/expensesEnums";
 
-enum ExpenseTabsEnum {
-  NEW = "new",
-  SEARCH = "search",
-  HACIENDA = "hacienda",
-}
 
 const ExpenseTabsItems = [
   {
-    value: ExpenseTabsEnum.NEW,
+    value: EExpenseTabs.NEW,
     icon: <CirclePlus size="16" className="mr-2" />,
     label: "Nuevo",
     content: <ExpenseTabNew />,
   },
   {
-    value: ExpenseTabsEnum.SEARCH,
+    value: EExpenseTabs.SEARCH,
     icon: <Search size="16" className="mr-2" />,
     label: "Buscar",
     content: <ExpenseTabSearch />,
   },
   {
-    value: ExpenseTabsEnum.HACIENDA,
+    value: EExpenseTabs.HACIENDA,
     icon: <Landmark size="16" className="mr-2" />,
     label: "Hacienda",
     content: <ExpenseTabHacienda />,
@@ -37,7 +33,7 @@ const ExpenseTabsItems = [
 
 const ExpenseTabsList = () => {
   const { fnSetParams } = useHandleExpenseParams();
-  function handleClick(value: ExpenseTabsEnum) {
+  function handleClick(value: EExpenseTabs) {
     fnSetParams([{ key: EExpenseQueryParams.expenseTab, value }]);
   }
   return (
@@ -71,7 +67,7 @@ const ExpenseTabsContent = () => {
 const ExpenseTabs = () => {
   const { getActualParams } = useHandleExpenseParams();
   const { expenseTab: expenseTabParams } = getActualParams;
-  const defaultTab = expenseTabParams || ExpenseTabsEnum.NEW;
+  const defaultTab = expenseTabParams || EExpenseTabs.NEW;
   return (
     <Tabs defaultValue={defaultTab}>
       <ExpenseTabsList />

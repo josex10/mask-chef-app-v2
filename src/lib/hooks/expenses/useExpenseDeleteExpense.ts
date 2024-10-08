@@ -22,11 +22,11 @@ export const useExpenseDeleteExpense = () => {
       }
 
       await queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.expensesTable],
+        queryKey: [EQueryClientsKeys.expensesTableLastCreated],
       });
 
       await queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.expensesFinantialInfo],
+        queryKey: [EQueryClientsKeys.expensesTable],
       });
 
       queryClient.setQueryData<string | null>(
