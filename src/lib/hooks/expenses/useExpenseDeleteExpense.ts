@@ -5,9 +5,12 @@ import { IDeleteExpenseAction } from "@/utils/interfaces/private/admin/expenseDe
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useHandleExpenseParams } from "./useExpenseHandleQueryParams";
+import { EExpenseTabs } from "@/utils/enums/expensesEnums";
 
 export const useExpenseDeleteExpense = () => {
   const queryClient = useQueryClient();
+  const { getActualParams } = useHandleExpenseParams();
 
   return useMutation({
     mutationFn: (data: IDeleteExpenseAction) => {
@@ -21,13 +24,13 @@ export const useExpenseDeleteExpense = () => {
         return;
       }
 
-      await queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.expensesTableLastCreated],
-      });
-
-      await queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.expensesTable],
-      });
+      getActualParams.expenseTab === EExpenseTabs.NEW
+        ? queryClient.refetchQueries({
+            queryKey: [EQueryClientsKeys.expensesTableLastCreated],
+          })
+        : queryClient.refetchQueries({
+            queryKey: [EQueryClientsKeys.expensesTable],
+          });
 
       queryClient.setQueryData<string | null>(
         [EQueryClientsKeys.singleExpense],
