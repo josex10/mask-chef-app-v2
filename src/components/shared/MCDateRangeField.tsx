@@ -44,11 +44,11 @@ const MCDateRangeField: React.FC<any> = ({
             {field.value.from ? (
               field.value.to ? (
                 <>
-                  {format(field.value.from, "MM-dd-yyyy")} /{" "}
-                  {format(field.value.to, "MM-dd-yyyy")}
+                  {format(field.value.from, "dd-MM-yyyy")} /{" "}
+                  {format(field.value.to, "dd-MM-yyyy")}
                 </>
               ) : (
-                format(field.value.from, "MM-dd-yyyy")
+                format(field.value.from, "dd-MM-yyyy")
               )
             ) : (
               <span>{placeholder}</span>
