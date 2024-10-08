@@ -5,9 +5,13 @@ import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { get } from "http";
+import { useHandleExpenseParams } from "./useExpenseHandleQueryParams";
+import { EExpenseTabs } from "@/utils/enums/expensesEnums";
 
 export const useExpenseAddPayment = () => {
   const queryClient = useQueryClient();
+  const { getActualParams } = useHandleExpenseParams();
 
   return useMutation({
     mutationFn: (data) => {
@@ -16,9 +20,14 @@ export const useExpenseAddPayment = () => {
     onSuccess: async (data: string) => {
       const response = JSON.parse(data) as IServerActionResponse;
 
-      queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.expensesTable],
-      });
+      getActualParams.expenseTab === EExpenseTabs.NEW
+        ? queryClient.refetchQueries({
+            queryKey: [EQueryClientsKeys.expensesTableLastCreated],
+          })
+        : queryClient.refetchQueries({
+            queryKey: [EQueryClientsKeys.expensesTable],
+          });
+
       queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });
