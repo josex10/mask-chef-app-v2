@@ -8,3 +8,9 @@ export enum EStatus {
   payed = "Pagado",
   pending = "Pendiente",
 }
+
+export enum EExpenseTabs {
+  NEW = "new",
+  SEARCH = "search",
+  HACIENDA = "hacienda",
+}

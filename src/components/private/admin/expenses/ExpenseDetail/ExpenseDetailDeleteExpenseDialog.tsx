@@ -10,7 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useExpenseDeleteExpense } from "@/lib/hooks/expenses/useExpenseDeleteExpense";
+import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
 import useStoreExpenseDeleteExpenseDialog from "@/store/private/expenses/storeExpenseDeleteExpenseDialog";
+import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 import { Trash2 } from "lucide-react";
 
 type TExpenseDetailDeleteExpenseDialogProps = {
@@ -23,12 +25,16 @@ export function ExpenseDetailDeleteExpenseDialog({
 }: TExpenseDetailDeleteExpenseDialogProps) {
   const handleDialog = useStoreExpenseDeleteExpenseDialog();
   const deleleExpenseMutation = useExpenseDeleteExpense();
+  const { fnSetParams } = useHandleExpenseParams();
 
   const handleDelete = async () => {
     deleleExpenseMutation.mutate(
       { expenseId, expenseSummaryId },
       {
         onSuccess: () => {
+          fnSetParams([
+            { key: EExpenseQueryParams.expenseId, value: expenseId },
+          ],true);
           handleDialog.closeDialog();
         },
       }
