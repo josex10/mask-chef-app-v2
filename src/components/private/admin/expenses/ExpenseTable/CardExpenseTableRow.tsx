@@ -4,8 +4,10 @@ import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useCutExpenseClave } from "@/lib/hooks/expenses/expenses";
+import { useExpenseDateTypeBasedOnParams } from "@/lib/hooks/expenses/useExpenseDateTypeBasedOnParams";
 import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
 import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
+import { EExpenseFilterDateType } from "@/utils/enums/expensesEnums";
 import { EQueryClientsKeys } from "@/utils/enums/queryClientKeys";
 import {
   checkIfDateIsBeforeToday,
@@ -16,27 +18,28 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type TCardExpenseProp = {
   expense: IGroupExpenseTable;
-  showCreatedAt: boolean;
 };
 
-const CardExpenseTableRow = ({ expense, showCreatedAt }: TCardExpenseProp) => {
+const useHandleOnClick = (expenseId: string) => {
   const queryClient = useQueryClient();
-  const { getActualParams, fnSetParams } = useHandleExpenseParams();
-  const cutClave = useCutExpenseClave(expense.clave || "");
-
-  if (!expense) return;
-
-  const useHandleOnClick = () => {
-    fnSetParams([
-      { key: EExpenseQueryParams.expenseId, value: expense.id },
-    ]).then(() => {
-      if (getActualParams.expenseId === expense.id) return;
+  const { fnSetParams, getActualParams } = useHandleExpenseParams();
+  fnSetParams([{ key: EExpenseQueryParams.expenseId, value: expenseId }]).then(
+    () => {
+      if (getActualParams.expenseId === expenseId) return;
 
       queryClient.refetchQueries({
         queryKey: [EQueryClientsKeys.singleExpense],
       });
-    });
-  };
+    }
+  );
+};
+
+const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
+  const { getActualParams } = useHandleExpenseParams();
+  const cutClave = useCutExpenseClave(expense.clave || "");
+  const dateType = useExpenseDateTypeBasedOnParams();
+
+  if (!expense) return;
 
   const selectedClass =
     getActualParams.expenseId && expense.id === getActualParams.expenseId
@@ -46,7 +49,10 @@ const CardExpenseTableRow = ({ expense, showCreatedAt }: TCardExpenseProp) => {
   const isOverdue = checkIfDateIsBeforeToday(expense.paymentExpirationDate);
 
   return (
-    <TableRow onClick={useHandleOnClick} className={selectedClass}>
+    <TableRow
+      onClick={() => useHandleOnClick(expense.id)}
+      className={selectedClass}
+    >
       <TableCell className="w-[30vw] ">
         <div className="font-medium">{expense.providerName}</div>
         <div className="hidden text-sm text-muted-foreground md:inline">
@@ -68,9 +74,11 @@ const CardExpenseTableRow = ({ expense, showCreatedAt }: TCardExpenseProp) => {
         )}
       </TableCell>
       <TableCell className="hidden sm:table-cell">
-        {showCreatedAt
+        {dateType?.key === EExpenseFilterDateType.Created
           ? convertDateToStandard(String(expense.createdAt))
-          : convertDateToStandard(String(expense.fechaEmision))}
+          : dateType?.key === EExpenseFilterDateType.Emision
+          ? convertDateToStandard(String(expense.fechaEmision))
+          : convertDateToStandard(String(expense.paymentExpirationDate))}
       </TableCell>
       <TableCell className="font-medium">
         <TextFieldForCurrency totalAmount={expense.totalComprobante} />
