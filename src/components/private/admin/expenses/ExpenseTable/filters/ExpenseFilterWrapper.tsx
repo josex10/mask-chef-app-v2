@@ -24,12 +24,7 @@ import { SchemaExpenseFrmFilter } from "@/utils/schemas/expenses/expenses.schema
 import MCInputField from "@/components/shared/MCInputField";
 import MCDateRangeField from "@/components/shared/MCDateRangeField";
 import MCSelectField from "@/components/shared/MCSelectField";
-
-const dateTypes = [
-  { key: EExpenseFilterDateType.Emision, value: "Emisión" },
-  { key: EExpenseFilterDateType.Created, value: "Creación" },
-  { key: EExpenseFilterDateType.PaymentExp, value: "Pago" },
-];
+import { CDateTypes } from "@/utils/constants/expenses/CDateTypes";
 
 const statusType = [
   { key: EStatus.payed, value: "Pagados" },
@@ -131,7 +126,7 @@ const ExpenseFilterWrapper = () => {
                 name="dateType"
                 label="Tipo de Fecha"
                 placeholder="Seleccione"
-                data={dateTypes}
+                data={CDateTypes}
               />
               <MCDateRangeField
                 control={form.control}

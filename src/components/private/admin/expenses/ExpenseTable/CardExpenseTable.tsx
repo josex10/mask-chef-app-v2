@@ -21,12 +21,10 @@ const ExpenseTableDescription = ({
   description,
 }: TExpenseTableDescriptionProps) => {
   return (
-    <>
-      <CardHeader className="px-7">
-        <CardTitle>{title && title}</CardTitle>
-        <CardDescription>{description && description}</CardDescription>
-      </CardHeader>
-    </>
+    <CardHeader className="px-7">
+      <CardTitle>{title && title}</CardTitle>
+      <CardDescription>{description && description}</CardDescription>
+    </CardHeader>
   );
 };
 
@@ -35,16 +33,10 @@ type TCardExpenseTableProps = {
   showCreatedAt: boolean;
   header?: TExpenseTableDescriptionProps;
 };
-const CardExpenseTable = ({
-  data,
-  showCreatedAt,
-  header,
-}: TCardExpenseTableProps) => {
+const CardExpenseTable = ({ data, header }: TCardExpenseTableProps) => {
   const expensesData = data
     ? (JSON.parse(data as string) as IGroupExpenseTable[])
     : [];
-
-
   return (
     <>
       {header && (
@@ -55,14 +47,11 @@ const CardExpenseTable = ({
       )}
       <Card className="h-[50vh] overflow-y-auto mt-2">
         <CardContent>
-          <ExpenseTableHeader showCreatedAt={showCreatedAt} />
+          <ExpenseTableHeader />
           {!expensesData || expensesData.length === 0 ? (
             <SharedCenterMessage message="Sin Resultados" />
           ) : (
-            <ExpenseTableBody
-              expensesData={expensesData}
-              showCreatedAt={showCreatedAt}
-            />
+            <ExpenseTableBody expensesData={expensesData} />
           )}
         </CardContent>
       </Card>
