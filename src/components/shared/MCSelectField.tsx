@@ -33,8 +33,8 @@ const MCSelectField: React.FC<any> = ({
   });
 
   return (
-    <FormItem>
-      <span>{label}</span>
+    <FormItem className="w-full">
+      <span className="text-sm">{label}</span>
       <FormControl>
         <Select
           onValueChange={field.onChange}

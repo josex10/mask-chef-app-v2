@@ -13,11 +13,13 @@ export default async function RootLayout({
     redirect("/sign-out");
   }
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <AdminSidebarComponent />
-      <div className="flex flex-col">
+    <div className="min-h-screen w-full xl:flex xl:flex-row">
+      <div className="xl:fixed">
+        <AdminSidebarComponent />
+      </div>
+      <div className="flex flex-col w-full xl:ml-[17vw] xl:overflow-x-hidden xl:overflow-y-hidden" >
         <AdminNavbarComponent cookie={cookie} />
-        <div className="overflow-auto">{children}</div>
+        <div className="overflow-auto p-5">{children}</div>
       </div>
     </div>
   );

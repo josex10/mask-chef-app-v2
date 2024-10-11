@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 
 const CardExpenseNew = () => {
   return (
-    <Card className="sm:col-span-2 md:h-[20vh]" x-chunk="dashboard-05-chunk-0">
+    // <Card className="sm:col-span-2 md:h-[20vh]">
+    <Card>
       <CardHeader className="pb-3">
         <CardTitle>Nuevo</CardTitle>
         <CardDescription className="max-w-lg text-balance leading-relaxed">

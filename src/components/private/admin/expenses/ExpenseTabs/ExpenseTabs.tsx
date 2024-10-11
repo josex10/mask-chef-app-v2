@@ -9,7 +9,6 @@ import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQue
 import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
 import { EExpenseTabs } from "@/utils/enums/expensesEnums";
 
-
 const ExpenseTabsItems = [
   {
     value: EExpenseTabs.NEW,
@@ -37,7 +36,7 @@ const ExpenseTabsList = () => {
     fnSetParams([{ key: EExpenseQueryParams.expenseTab, value }]);
   }
   return (
-    <TabsList>
+    <TabsList className="w-full p-6">
       {ExpenseTabsItems.map(({ value, icon, label }) => (
         <TabsTrigger
           key={value}

@@ -65,8 +65,8 @@ export function ExpenseDetailDeleteExpenseDialog({
             <LoadingSpinner className="text-gray-500" />
           </div>
         ) : (
-          <DialogFooter>
-            <Button onClick={handleDelete}>Eliminar</Button>
+          <DialogFooter className="flex gap-2">
+            <Button onClick={handleDelete} variant={"destructive"}>Eliminar</Button>
             <Button onClick={handleDialog.closeDialog}>Cancelar</Button>
           </DialogFooter>
         )}

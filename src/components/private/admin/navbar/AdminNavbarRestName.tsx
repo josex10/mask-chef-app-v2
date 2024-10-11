@@ -8,7 +8,7 @@ const AdminNavbarRestName = () => {
   const {selectedRestaurant} = useStoreAuth((state) => state);
   return (
     <CardTitle className="flex flex-col justify-center items-center text-sm">
-      <div className="hidden lg:block">
+      <div className="hidden md:block">
         <div className="flex flex-row justify-center items-center gap-2">
           <Store />
           {selectedRestaurant?.name && <p>{selectedRestaurant.name}</p>}

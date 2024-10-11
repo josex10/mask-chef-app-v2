@@ -116,9 +116,9 @@ const ExpenseFilterWrapper = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(useHandleAction)}
-        className="flex flex-col md:flex-row gap-2"
+        className="flex flex-col gap-2 xl:flex-row"
       >
-        <Card>
+        <Card className="xl:w-[50%]">
           <CardContent className="flex flex-col gap-2 mt-2">
             <div className="flex flex-col md:flex-row gap-3 items-center">
               <MCSelectField
@@ -146,8 +146,8 @@ const ExpenseFilterWrapper = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="flex flex-col  mt-2 gap-2  h-full justify-between">
+        <Card className="xl:w-[50%]">
+          <CardContent className="flex flex-col gap-2 mt-2 xl:h-[100%] xl:justify-between">
             <div className="flex flex-col md:flex-row gap-3 ">
               <MCSelectField
                 control={form.control}

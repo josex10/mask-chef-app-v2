@@ -29,7 +29,7 @@ const MCInputField: React.FC<any> = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel htmlFor={name}>{label}</FormLabel>
+          <span className="text-sm">{label}</span>
           <FormControl>
             <Input
               placeholder={placeholder}
