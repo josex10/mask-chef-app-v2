@@ -9,10 +9,11 @@ import UploadExpenseBtn from "./UploadExpenseBtn";
 
 const CardExpenseUpload = () => {
   return (
-    <Card className="sm:col-span-2 md:h-[20vh]" x-chunk="dashboard-05-chunk-0">
+    // <Card className="sm:col-span-2 md:h-[20vh]">
+    <Card>
       <CardHeader className="pb-3">
         <CardTitle>Importar <span className="text-sm text-muted">Válido solo para CRC.</span></CardTitle>
-        <CardDescription className="max-w-lg text-balance leading-relaxed">
+        <CardDescription className="text-balance leading-relaxed">
           Importa sus gastos fácilmente al sistema, subiendo el archivo XML
           emitido por Hacienda. 
         </CardDescription>

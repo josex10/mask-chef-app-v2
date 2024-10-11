@@ -2,6 +2,8 @@ import ExpenseFilterWrapper from "../ExpenseTable/filters/ExpenseFilterWrapper";
 import { useGetExpenseTableData } from "@/lib/hooks/expenses/useExpenseTable";
 import SkeletonTable from "../Skeletons/SkeletonTable";
 import CardExpenseTable from "../ExpenseTable/CardExpenseTable";
+import CardExpenseDetail from "../ExpenseDetail/CardExpenseDetail";
+import { EReactQueryStatus } from "@/utils/enums/EReactQueryStatus";
 
 const headerDescription = {
   title: "Lista de Gastos",
@@ -9,23 +11,28 @@ const headerDescription = {
 };
 
 const ExpenseTabSearch = () => {
-  const { data, isLoading, isFetching } = useGetExpenseTableData();
+  const { status, data } = useGetExpenseTableData();
 
   return (
-    <>
-      {isLoading || isFetching ? (
-        <SkeletonTable />
-      ) : (
-        <>
-          <ExpenseFilterWrapper />
+    <section className="xl:flex xl:flex-row xl:gap-2 xl:h-[80vh] xl:overflow-x-hidden">
+      <div className=" xl:w-[58vw]">
+        <ExpenseFilterWrapper />
+
+        {status === EReactQueryStatus.pending ? (
+          <SkeletonTable />
+        ) : (
           <CardExpenseTable
             showCreatedAt={true}
             data={data}
             header={headerDescription}
           />
-        </>
-      )}
-    </>
+        )}
+      </div>
+
+      <div className="xl:w-[22vw]">
+        <CardExpenseDetail />
+      </div>
+    </section>
   );
 };
 

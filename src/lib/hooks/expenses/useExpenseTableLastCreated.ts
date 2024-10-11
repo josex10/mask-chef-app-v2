@@ -10,6 +10,7 @@ export const useGetExpenseTableLastCreated = () => {
   return useQuery<string | null>({
     queryKey: [EQueryClientsKeys.expensesTableLastCreated],
     queryFn: async () => await getExpenseTableLastCreated(),
+    refetchOnWindowFocus: false,
     select(data) {
       //TODO: IMPROVE THE RESPONSE
       try {

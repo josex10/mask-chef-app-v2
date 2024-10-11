@@ -20,24 +20,11 @@ type TCardExpenseProp = {
   expense: IGroupExpenseTable;
 };
 
-const useHandleOnClick = (expenseId: string) => {
-  const queryClient = useQueryClient();
-  const { fnSetParams, getActualParams } = useHandleExpenseParams();
-  fnSetParams([{ key: EExpenseQueryParams.expenseId, value: expenseId }]).then(
-    () => {
-      if (getActualParams.expenseId === expenseId) return;
-
-      queryClient.refetchQueries({
-        queryKey: [EQueryClientsKeys.singleExpense],
-      });
-    }
-  );
-};
-
 const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
-  const { getActualParams } = useHandleExpenseParams();
   const cutClave = useCutExpenseClave(expense.clave || "");
   const dateType = useExpenseDateTypeBasedOnParams();
+  const queryClient = useQueryClient();
+  const { fnSetParams, getActualParams } = useHandleExpenseParams();
 
   if (!expense) return;
 
@@ -48,9 +35,21 @@ const CardExpenseTableRow = ({ expense }: TCardExpenseProp) => {
 
   const isOverdue = checkIfDateIsBeforeToday(expense.paymentExpirationDate);
 
+  const fnHandleClick = (expenseId: string) => {
+    fnSetParams([
+      { key: EExpenseQueryParams.expenseId, value: expenseId },
+    ]).then(() => {
+      if (getActualParams.expenseId === expenseId) return;
+
+      queryClient.refetchQueries({
+        queryKey: [EQueryClientsKeys.singleExpense],
+      });
+    });
+  };
+
   return (
     <TableRow
-      onClick={() => useHandleOnClick(expense.id)}
+      onClick={() => fnHandleClick(expense.id)}
       className={selectedClass}
     >
       <TableCell className="w-[30vw] ">

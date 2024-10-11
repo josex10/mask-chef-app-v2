@@ -19,7 +19,7 @@ const AdminNavbarComponent = ({ cookie }: TAdminNavbarComponent) => {
   }, [login, cookie]);
 
   return (
-    <header className="flex h-[8vh] items-center gap-4 border-b bg-muted px-4  lg:px-6 sticky top-0 z-50">
+    <header className="flex h-[8vh] items-center gap-4 border-b bg-muted px-4 sticky top-0 z-50">
       <AdminNavbarSheetComponent />
       <div className="flex-1"></div>
       <div className="flex flex-row gap-4">

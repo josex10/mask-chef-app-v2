@@ -28,15 +28,15 @@ const MCDateRangeField: React.FC<any> = ({
   });
 
   return (
-    <FormItem className="flex flex-col">
-      <span>{label}</span>
+    <FormItem className="w-full">
+      <span className="text-sm">{label}</span>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             id={`btn-${name}`}
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "w-full justify-start text-left font-normal",
               !field.value.from && "text-muted-foreground"
             )}
           >

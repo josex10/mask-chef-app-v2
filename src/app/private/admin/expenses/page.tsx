@@ -3,14 +3,9 @@ import ExpenseTabs from "@/components/private/admin/expenses/ExpenseTabs/Expense
 
 const ExpensesPage = () => {
   return (
-    <div className="flex flex-col md:flex-row gap-2 md:justify-center md:items-center h-[92vh] p-2">
-      <div className="h-full w-full p-5">
-        <ExpenseTabs />
-      </div>
-
-      <div className="h-full w-full p-5 md:max-w-[23vw]">
-        <CardExpenseDetail />
-      </div>
+    // <div className="flex flex-col md:flex-row gap-2 md:justify-center md:items-center h-[92vh] p-2">
+    <div className="w-full">
+      <ExpenseTabs />
     </div>
   );
 };
