@@ -1,16 +1,17 @@
-import ExpenseFilterWrapper from "../ExpenseTable/filters/ExpenseFilterWrapper";
+"use client";
+
+import CardExpenseDetail from "@/components/private/admin/expenses/ExpenseDetail/CardExpenseDetail";
+import CardExpenseTable from "@/components/private/admin/expenses/ExpenseTable/CardExpenseTable";
+import ExpenseFilterWrapper from "@/components/private/admin/expenses/ExpenseTable/filters/ExpenseFilterWrapper";
+import SkeletonTable from "@/components/private/admin/expenses/Skeletons/SkeletonTable";
 import { useGetExpenseTableData } from "@/lib/hooks/expenses/useExpenseTable";
-import SkeletonTable from "../Skeletons/SkeletonTable";
-import CardExpenseTable from "../ExpenseTable/CardExpenseTable";
-import CardExpenseDetail from "../ExpenseDetail/CardExpenseDetail";
 import { EReactQueryStatus } from "@/utils/enums/EReactQueryStatus";
 
 const headerDescription = {
   title: "Lista de Gastos",
   description: "Muestra la lista de gastos según el filtro seleccionado.",
 };
-
-const ExpenseTabSearch = () => {
+const ExpenseSearch = () => {
   const { status, data } = useGetExpenseTableData();
 
   return (
@@ -36,4 +37,4 @@ const ExpenseTabSearch = () => {
   );
 };
 
-export default ExpenseTabSearch;
+export default ExpenseSearch;
