@@ -45,7 +45,7 @@ const CardExpenseTable = ({ data, header }: TCardExpenseTableProps) => {
           description={header.description}
         />
       )}
-      <Card className="max-h-[500px] mb-5 overflow-y-auto mt-2 xl:h-[49vh]">
+      <Card className="max-h-[500px] mb-5 overflow-y-auto mt-2 xl:h-[46vh]">
         <CardContent>
           <ExpenseTableHeader />
           {!expensesData || expensesData.length === 0 ? (
