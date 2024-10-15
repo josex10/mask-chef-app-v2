@@ -13,6 +13,7 @@ import { IExpensesSummary } from "@/utils/interfaces/private/admin/expensesSumma
 import { ExpenseSummarySchema } from "@/utils/schemas/private/ExpenseSummarySchema";
 import { IExpensesLineDetail } from "@/utils/interfaces/private/admin/expensesLineDetail";
 import { GroupExpenseLineDetailSchema } from "@/utils/schemas/private/ExpenseLineDetailSchema";
+import ICountry from "@/utils/interfaces/private/admin/country";
 
 type TCreateExpenseFromXml = {
   error: boolean;
@@ -23,9 +24,11 @@ type TCreateExpenseFromXml = {
 export const createExpenseFromXml = async (
   xmlData: string,
   restaurant: IRestaurant,
-  user: IUser
+  user: IUser,
+  countrySettings: ICountry
 ): Promise<TCreateExpenseFromXml> => {
   try {
+    console.log(restaurant);
     const xmlToJson = await readXmlData(xmlData);
 
     if (!xmlToJson) throw new Error("Error reading the XML");
@@ -82,7 +85,8 @@ export const createExpenseFromXml = async (
 
     //CREATE THE EXPENSE SUMMARY
     const expenseSummaryResponse = await createExpenseSummaryOnDb(
-      ResumenFactura
+      ResumenFactura,
+      countrySettings
     );
     if (expenseSummaryResponse.error && !expenseSummaryResponse.summaryId) {
       throw new Error(expenseSummaryResponse.message);
@@ -113,14 +117,14 @@ export const createExpenseFromXml = async (
       error: false,
       message: "Create Successfully",
       expenseId: expenseResponse.expenseId,
-      expenseDate: expenseResponse.expenseDate
+      expenseDate: expenseResponse.expenseDate,
     };
   } catch (error: any) {
     return {
       error: true,
       message: error.message ? error.message : "Error creating the expense.",
       expenseId: null,
-      expenseDate: null
+      expenseDate: null,
     };
   }
 };
@@ -240,7 +244,10 @@ type TCreateExpenseOnDb = {
   expenseDate: Date | null;
 };
 
-const createExpenseSummaryOnDb = async (summary: any) => {
+const createExpenseSummaryOnDb = async (
+  summary: any,
+  countrySettings: ICountry
+) => {
   if (!summary)
     return {
       error: true,
@@ -250,7 +257,9 @@ const createExpenseSummaryOnDb = async (summary: any) => {
     };
 
   const newExpenseSummary: IExpensesSummary = {
-    CodigoTipoMoneda: summary.CodigoTipoMoneda.CodigoMoneda,
+    CodigoTipoMoneda:
+      summary.CodigoTipoMoneda?.CodigoMoneda ||
+      countrySettings.currency_short_name,
     TotalServGravados: summary.TotalServGravados
       ? Number(summary.TotalServGravados)
       : 0,
