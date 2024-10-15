@@ -22,6 +22,7 @@ const UploadExpenseBtn = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const restaurantSelected = useStoreAuth((state) => state.selectedRestaurant);
+  const countrySettings = useStoreAuth((state) => state.countrySettings);
   const user = useStoreAuth((state) => state.user);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,13 +54,14 @@ const UploadExpenseBtn = () => {
       if (evt.target?.result) {
         const rules = fileRules(file);
         if (!rules) {
-          if (!restaurantSelected || !user) {
+          if (!restaurantSelected || !user || !countrySettings) {
             redirect("/sign-out");
           }
           const xmlResponse = await createExpenseFromXml(
             evt.target.result as string,
             restaurantSelected,
-            user
+            user,
+            countrySettings
           );
           if (xmlResponse.error) {
             toast.error(xmlResponse.message);
