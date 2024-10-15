@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 
-export const listOfMonths = [
+const listOfMonths = [
   { key: "1", value: "Enero" },
   { key: "2", value: "Febrero" },
   { key: "3", value: "Marzo" },
@@ -45,7 +45,7 @@ export const listOfMonths = [
   { key: "12", value: "Diciembre" },
 ];
 
-export const listOFYears = [
+const listOFYears = [
   { key: "2021", value: 2021 },
   { key: "2022", value: 2022 },
   { key: "2023", value: 2023 },
@@ -114,7 +114,7 @@ const FrmHacienda = () => {
 type TTableHaciendaProps = {
   data: IExpenseDataHacienda | null;
 };
-export function TableHacienda({ data }: TTableHaciendaProps) {
+function TableHacienda({ data }: TTableHaciendaProps) {
   return (
     data?.taxGroup && (
       <Table>
