@@ -3,4 +3,9 @@ export enum EQueryClientsKeys {
     singleExpense = "singleExpense",
     expensesFinantialInfo = "expensesFinantialInfo",
     expensePaymentType = "expensePaymentType",
+    expensesTableLastCreated = "expensesTableLastCreated",
+    expensesHaciendaData = "expensesHaciendaData",
+
+    // Providers
+    getAllProvidersForSelect = "getAllProvidersForSelect",
 }

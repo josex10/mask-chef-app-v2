@@ -2,5 +2,9 @@ export enum EExpenseQueryParams {
     startDate = 'startDate',
     endDate = 'endDate',
     expenseId = 'expenseId',
-    offset = 'offset'
+    dateType = 'dateType',
+    expenseKey = 'expenseKey',
+    expenseStatus = 'expenseStatus',
+    providerId= 'providerId',
+    expenseTab = 'expenseTab'
 }
