@@ -13,12 +13,14 @@ type TMCDateRangeField = {
   name: string;
   label: string;
   placeholder: string;
+  isDisabled: boolean;
 };
 const MCDateRangeField: React.FC<any> = ({
   control,
   name,
   label,
   placeholder,
+  isDisabled
 }: TMCDateRangeField) => {
   const {
     field: { ref, ...field },
@@ -39,6 +41,7 @@ const MCDateRangeField: React.FC<any> = ({
               "w-full justify-start text-left font-normal",
               !field.value.from && "text-muted-foreground"
             )}
+            disabled={isDisabled}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {field.value.from ? (

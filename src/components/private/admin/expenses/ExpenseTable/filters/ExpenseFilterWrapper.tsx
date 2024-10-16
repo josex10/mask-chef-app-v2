@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-import { Filter, FilterX } from "lucide-react";
+import { FilterX, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useHandleExpenseParams } from "@/lib/hooks/expenses/useExpenseHandleQueryParams";
 import { Form } from "@/components/ui/form";
@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetAllProvidersForSelect } from "@/lib/hooks/providers/providersHooks";
 import { IProvidersForSelect } from "@/utils/interfaces/private/admin/providersInterfaces";
 import { EExpenseQueryParams } from "@/utils/enums/expenseQueryParams";
-import { EExpenseFilterDateType, EStatus } from "@/utils/enums/expensesEnums";
+import { EStatus } from "@/utils/enums/expensesEnums";
 import {
   checkUnixStringDateIsValid,
   converDateToUnix,
@@ -57,7 +57,7 @@ const ExpenseFilterWrapper = () => {
   const form = useForm<z.infer<typeof SchemaExpenseFrmFilter>>({
     resolver: zodResolver(SchemaExpenseFrmFilter),
     defaultValues: {
-      dateType: dateType ? dateType : EExpenseFilterDateType.Emision,
+      dateType: dateType ? dateType : "all",
       date: {
         from: startDate
           ? checkUnixStringDateIsValid(startDate)
@@ -105,7 +105,7 @@ const ExpenseFilterWrapper = () => {
   };
 
   const resetForm = () => {
-    form.setValue("dateType", EExpenseFilterDateType.Emision);
+    form.setValue("dateType", "all");
     form.setValue("date", { from: new Date(), to: new Date() });
     form.setValue("expenseKey", "");
     form.setValue("expenseStatus", "all");
@@ -127,12 +127,17 @@ const ExpenseFilterWrapper = () => {
                 label="Tipo de Fecha"
                 placeholder="Seleccione"
                 data={CDateTypes}
+                showAll={true}
               />
               <MCDateRangeField
                 control={form.control}
                 name="date"
                 label="Rango de Fechas"
                 placeholder="Seleccione"
+                isDisabled={
+                  form.watch("dateType") === "" ||
+                  form.watch("dateType") === "all"
+                }
               />
             </div>
             <div>
@@ -173,8 +178,8 @@ const ExpenseFilterWrapper = () => {
                 Limpiar
               </Button>
               <Button type="submit" size={"sm"}>
-                <Filter />
-                Filtrar
+                <Search />
+                Buscar
               </Button>
             </div>
           </CardContent>

@@ -19,7 +19,7 @@ const ExpensesPage = () => {
     <section className="xl:flex xl:flex-row xl:gap-2 xl:h-[80vh] xl:overflow-x-hidden">
       <div className=" xl:w-[58vw]">
         <div className="flex flex-col gap-2 md:flex-row xl:h-[20vh]">
-          <CardExpenseNew />
+          {/* <CardExpenseNew /> */}
           <CardExpenseUpload />
         </div>
 

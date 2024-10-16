@@ -15,16 +15,26 @@ import ExpenseTableBody from "./ExpenseTableBody";
 type TExpenseTableDescriptionProps = {
   title?: string;
   description?: string;
+  amountOfRows?: number;
 };
 const ExpenseTableDescription = ({
   title,
   description,
+  amountOfRows,
 }: TExpenseTableDescriptionProps) => {
   return (
-    <CardHeader className="px-7">
-      <CardTitle>{title && title}</CardTitle>
-      <CardDescription>{description && description}</CardDescription>
-    </CardHeader>
+    <section className="flex flex-row justify-between">
+      <CardHeader className="px-7">
+        <CardTitle>{title && title}</CardTitle>
+        <CardDescription>{description && description}</CardDescription>
+      </CardHeader>
+
+      <CardHeader className="px-7 flex flex-col justify-end">
+        <CardDescription>
+          Número de Registros: {amountOfRows ? amountOfRows : 0}
+        </CardDescription>
+      </CardHeader>
+    </section>
   );
 };
 
@@ -43,6 +53,7 @@ const CardExpenseTable = ({ data, header }: TCardExpenseTableProps) => {
         <ExpenseTableDescription
           title={header.title}
           description={header.description}
+          amountOfRows={expensesData.length}
         />
       )}
       <Card className="max-h-[500px] mb-5 overflow-y-auto mt-2 xl:h-[46vh]">

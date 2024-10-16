@@ -49,7 +49,6 @@ export const fetchDataForHaciendaAction = async (
 
     return JSON.stringify(response);
   } catch (error) {
-    console.log(error);
     const response: IServerActionResponse = {
       error: true,
       message: `Ha ocurrido un generando la data de Hacienda.`,

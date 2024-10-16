@@ -2,9 +2,11 @@ import { Banknote, ConciergeBell, DollarSign, ReceiptText } from "lucide-react";
 import DashboardCardComponent from "@/components/private/admin/dashboard/DashboardCard";
 import DashboardTableWrapperComponent from "@/components/private/admin/dashboard/DashboardTableWrapper";
 import DashboardChartWrapperComponent from "@/components/private/admin/dashboard/DashboardChartWrapper";
+import { redirect } from "next/navigation";
 
 export default function Dashboard() {
-  // initialValidationAction();
+
+  redirect("/private/admin/expenses");
   
   const cardsHeaderData = [
     {
