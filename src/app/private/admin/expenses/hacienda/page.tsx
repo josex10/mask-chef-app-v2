@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-import { Filter } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -100,8 +100,8 @@ const FrmHacienda = () => {
 
             <div className="flex flex-row justify-end gap-2 items-end ">
               <Button type="submit" size={"sm"}>
-                <Filter />
-                Filtrar
+                <Search />
+                Buscar
               </Button>
             </div>
           </CardContent>
