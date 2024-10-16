@@ -28,7 +28,6 @@ export const createExpenseFromXml = async (
   countrySettings: ICountry
 ): Promise<TCreateExpenseFromXml> => {
   try {
-    console.log(restaurant);
     const xmlToJson = await readXmlData(xmlData);
 
     if (!xmlToJson) throw new Error("Error reading the XML");
@@ -108,7 +107,8 @@ export const createExpenseFromXml = async (
     const lineDetailResponse = await createExpenseLineDetailOnDb(
       DetalleServicio.LineaDetalle,
       expenseResponse.expenseId as string,
-      expenseSummaryResponse.summaryId as string
+      expenseSummaryResponse.summaryId as string,
+      expenseSummaryResponse.tipoDeCambio as number
     );
     if (lineDetailResponse.error) {
       throw new Error(lineDetailResponse.message);
@@ -244,66 +244,95 @@ type TCreateExpenseOnDb = {
   expenseDate: Date | null;
 };
 
+const checkTipoDeMonedaAndTipoDeCambio = (
+  invoiceCurrencyTypeObj: any,
+  countrySettings: ICountry
+) => {
+  const getCurrencyName = (): string => {
+    return invoiceCurrencyTypeObj?.CodigoMoneda
+      ? invoiceCurrencyTypeObj.CodigoMoneda
+      : countrySettings.currency_short_name;
+  };
+
+  const assignCurrencyExchange = () => {
+    if (invoiceCurrencyTypeObj?.TipoCambio) {
+      return getCurrencyName() === countrySettings.currency_short_name
+        ? 1
+        : Number(invoiceCurrencyTypeObj.TipoCambio);
+    }
+    return 1;
+  };
+  return {
+    tipoMoneda: getCurrencyName(),
+    tipoCambio: assignCurrencyExchange(),
+  };
+};
+
 const createExpenseSummaryOnDb = async (
   summary: any,
   countrySettings: ICountry
 ) => {
-  if (!summary)
-    return {
-      error: true,
-      message:
-        "The purchase XML does not provide the 'Expense Summary' information.",
-      summaryId: null,
-    };
-
-  const newExpenseSummary: IExpensesSummary = {
-    CodigoTipoMoneda:
-      summary.CodigoTipoMoneda?.CodigoMoneda ||
-      countrySettings.currency_short_name,
-    TotalServGravados: summary.TotalServGravados
-      ? Number(summary.TotalServGravados)
-      : 0,
-    TotalServExentos: summary.TotalServExentos
-      ? Number(summary.TotalServExentos)
-      : 0,
-    TotalServExonerado: summary.TotalServExonerado
-      ? Number(summary.TotalServExonerado)
-      : 0,
-    TotalMercanciasGravadas: summary.TotalMercanciasGravadas
-      ? Number(summary.TotalMercanciasGravadas)
-      : 0,
-    TotalMercanciasExentas: summary.TotalMercanciasExentas
-      ? Number(summary.TotalMercanciasExentas)
-      : 0,
-    TotalMercExonerada: summary.TotalMercExonerada
-      ? Number(summary.TotalMercExonerada)
-      : 0,
-    TotalGravado: summary.TotalGravado ? Number(summary.TotalGravado) : 0,
-    TotalExento: summary.TotalExento ? Number(summary.TotalExento) : 0,
-    TotalExonerado: summary.TotalExonerado ? Number(summary.TotalExonerado) : 0,
-    TotalVenta: summary.TotalVenta ? Number(summary.TotalVenta) : 0,
-    TotalDescuentos: summary.TotalDescuentos
-      ? Number(summary.TotalDescuentos)
-      : 0,
-    TotalVentaNeta: summary.TotalVentaNeta ? Number(summary.TotalVentaNeta) : 0,
-    TotalImpuesto: summary.TotalImpuesto ? Number(summary.TotalImpuesto) : 0,
-    TotalComprobante: summary.TotalComprobante
-      ? Number(summary.TotalComprobante)
-      : 0,
-  };
-
-  const validation = ExpenseSummarySchema.safeParse(newExpenseSummary);
-
-  if (validation.error) {
-    return {
-      error: true,
-      message: "Error validating the expense summary",
-      summaryId: null,
-    };
-  }
-
   try {
     const xata = getXataClient();
+    if (!summary)
+      throw new Error("El XML no contiene el resumen de la factura.");
+
+    const { tipoMoneda, tipoCambio } = checkTipoDeMonedaAndTipoDeCambio(
+      summary.CodigoTipoMoneda,
+      countrySettings
+    );
+
+    const newExpenseSummary: IExpensesSummary = {
+      CodigoTipoMoneda: tipoMoneda,
+      TotalServGravados: summary.TotalServGravados
+        ? Number(summary.TotalServGravados) * tipoCambio
+        : 0,
+      TotalServExentos: summary.TotalServExentos
+        ? Number(summary.TotalServExentos) * tipoCambio
+        : 0,
+      TotalServExonerado: summary.TotalServExonerado
+        ? Number(summary.TotalServExonerado) * tipoCambio
+        : 0,
+      TotalMercanciasGravadas: summary.TotalMercanciasGravadas
+        ? Number(summary.TotalMercanciasGravadas) * tipoCambio
+        : 0,
+      TotalMercanciasExentas: summary.TotalMercanciasExentas
+        ? Number(summary.TotalMercanciasExentas) * tipoCambio
+        : 0,
+      TotalMercExonerada: summary.TotalMercExonerada
+        ? Number(summary.TotalMercExonerada) * tipoCambio
+        : 0,
+      TotalGravado: summary.TotalGravado
+        ? Number(summary.TotalGravado) * tipoCambio
+        : 0,
+      TotalExento: summary.TotalExento
+        ? Number(summary.TotalExento) * tipoCambio
+        : 0,
+      TotalExonerado: summary.TotalExonerado
+        ? Number(summary.TotalExonerado) * tipoCambio
+        : 0,
+      TotalVenta: summary.TotalVenta
+        ? Number(summary.TotalVenta) * tipoCambio
+        : 0,
+      TotalDescuentos: summary.TotalDescuentos
+        ? Number(summary.TotalDescuentos) * tipoCambio
+        : 0,
+      TotalVentaNeta: summary.TotalVentaNeta
+        ? Number(summary.TotalVentaNeta) * tipoCambio
+        : 0,
+      TotalImpuesto: summary.TotalImpuesto
+        ? Number(summary.TotalImpuesto) * tipoCambio
+        : 0,
+      TotalComprobante: summary.TotalComprobante
+        ? Number(summary.TotalComprobante) * tipoCambio
+        : 0,
+    };
+
+    const validation = ExpenseSummarySchema.safeParse(newExpenseSummary);
+
+    if (validation.error) {
+      throw new Error("Error validando el resumen de la factura");
+    }
 
     const expenseSummaryCreated = await xata.db.expenses_summary.create(
       newExpenseSummary
@@ -312,12 +341,14 @@ const createExpenseSummaryOnDb = async (
       error: false,
       message: "New expense summary created.",
       summaryId: expenseSummaryCreated.id,
+      tipoDeCambio: tipoCambio,
     };
   } catch (error) {
     return {
       error: true,
-      message: "Error creating the expense summary.",
+      message: "Ha ocurrido un error creando el resumen de la factura.",
       summaryId: null,
+      tipoDeCambio: null,
     };
   }
 };
@@ -373,7 +404,8 @@ const createExpenseOnDb = async (
 const createExpenseLineDetailOnDb = async (
   lineDetail: any,
   expenseId: string,
-  summaryId: string
+  summaryId: string,
+  tipoDeCambio: number
 ) => {
   try {
     if (!lineDetail)
@@ -386,20 +418,30 @@ const createExpenseLineDetailOnDb = async (
       lineDetail.forEach((line) => {
         groupOfLineDetail.push({
           expense: expenseId,
-          NumeroLinea: line.NumeroLinea ? Number(line.NumeroLinea) : 0,
+          NumeroLinea: line.NumeroLinea
+            ? Number(line.NumeroLinea) * tipoDeCambio
+            : 0,
           Codigo: line.Codigo ? line.Codigo : "",
           UnidadMedida: line.UnidadMedida ? line.UnidadMedida : "",
           Detalle: line.Detalle ? line.Detalle : "",
-          PrecioUnitario: line.PrecioUnitario ? Number(line.PrecioUnitario) : 0,
-          MontoTotal: line.MontoTotal ? Number(line.MontoTotal) : 0,
-          SubTotal: line.SubTotal ? Number(line.SubTotal) : 0,
+          PrecioUnitario: line.PrecioUnitario
+            ? Number(line.PrecioUnitario) * tipoDeCambio
+            : 0,
+          MontoTotal: line.MontoTotal
+            ? Number(line.MontoTotal) * tipoDeCambio
+            : 0,
+          SubTotal: line.SubTotal ? Number(line.SubTotal) * tipoDeCambio : 0,
           ImpuestoTarifa: line.Impuesto?.Tarifa
             ? Number(line.Impuesto.Tarifa)
             : 0,
-          ImpuestoMonto: line.Impuesto?.Monto ? Number(line.Impuesto.Monto) : 0,
-          ImpuestoNeto: line.Impuesto?.Neto ? Number(line.Impuesto.Neto) : 0,
+          ImpuestoMonto: line.Impuesto?.Monto
+            ? Number(line.Impuesto.Monto) * tipoDeCambio
+            : 0,
+          ImpuestoNeto: line.Impuesto?.Neto
+            ? Number(line.Impuesto.Neto) * tipoDeCambio
+            : 0,
           MontoTotalLinea: line.MontoTotalLinea
-            ? Number(line.MontoTotalLinea)
+            ? Number(line.MontoTotalLinea) * tipoDeCambio
             : 0,
           Cantidad: Number(line.Cantidad) || 0,
         });
@@ -408,27 +450,31 @@ const createExpenseLineDetailOnDb = async (
       groupOfLineDetail.push({
         expense: expenseId,
         NumeroLinea: lineDetail.NumeroLinea
-          ? Number(lineDetail.NumeroLinea)
+          ? Number(lineDetail.NumeroLinea) * tipoDeCambio
           : 0,
         Codigo: lineDetail.Codigo ? lineDetail.Codigo : "",
         UnidadMedida: lineDetail.UnidadMedida ? lineDetail.UnidadMedida : "",
         Detalle: lineDetail.Detalle ? lineDetail.Detalle : "",
         PrecioUnitario: lineDetail.PrecioUnitario
-          ? Number(lineDetail.PrecioUnitario)
+          ? Number(lineDetail.PrecioUnitario) * tipoDeCambio
           : 0,
-        MontoTotal: lineDetail.MontoTotal ? Number(lineDetail.MontoTotal) : 0,
-        SubTotal: lineDetail.SubTotal ? Number(lineDetail.SubTotal) : 0,
+        MontoTotal: lineDetail.MontoTotal
+          ? Number(lineDetail.MontoTotal) * tipoDeCambio
+          : 0,
+        SubTotal: lineDetail.SubTotal
+          ? Number(lineDetail.SubTotal) * tipoDeCambio
+          : 0,
         ImpuestoTarifa: lineDetail.Impuesto?.Tarifa
           ? Number(lineDetail.Impuesto.Tarifa)
           : 0,
         ImpuestoMonto: lineDetail.Impuesto?.Monto
-          ? Number(lineDetail.Impuesto.Monto)
+          ? Number(lineDetail.Impuesto.Monto) * tipoDeCambio
           : 0,
         ImpuestoNeto: lineDetail.Impuesto?.Neto
-          ? Number(lineDetail.Impuesto.Neto)
+          ? Number(lineDetail.Impuesto.Neto) * tipoDeCambio
           : 0,
         MontoTotalLinea: lineDetail.MontoTotalLinea
-          ? Number(lineDetail.MontoTotalLinea)
+          ? Number(lineDetail.MontoTotalLinea) * tipoDeCambio
           : 0,
         Cantidad: Number(lineDetail.Cantidad) || 0,
       });
