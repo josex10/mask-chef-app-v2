@@ -3,12 +3,12 @@ import { Home, LineChart, ReceiptText, Truck } from "lucide-react";
 import Link from "next/link";
 
 const links = [
-  {
-    label: "Inicio",
-    icon: <Home size="25"/>,
-    url: "/private/admin",
-    badge: null,
-  },
+  // {
+  //   label: "Inicio",
+  //   icon: <Home size="25"/>,
+  //   url: "/private/admin",
+  //   badge: null,
+  // },
   // {
   //   label: "Proveedores",
   //   icon: <Truck size="25" />,

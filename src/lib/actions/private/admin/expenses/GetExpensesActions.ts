@@ -135,7 +135,7 @@ export const getAllExpenses = async (
         $all: dbFilters(filter, resutaurantSelected.id),
       })
       .sort("fechaEmision", "asc")
-      .getAll();
+      .getMany({ pagination: { size: 100 } });
     if (!expenses) return null;
     const result: IGroupExpenseTable[] = expenses.map((expense) => {
       return {

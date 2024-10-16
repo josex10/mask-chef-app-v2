@@ -6,7 +6,8 @@ export const SchemaExpenseFrmFilter = z.object({
     .string({ message: EMessages.inputErrorTypeString })
     .trim()
     .min(1, { message: EMessages.inputErrorRequired })
-    .max(100, { message: `${EMessages.inputErrorMaxString} 100` }),
+    .max(100, { message: `${EMessages.inputErrorMaxString} 100` })
+    .optional(),
   date: z
     .object(
       {
@@ -17,7 +18,8 @@ export const SchemaExpenseFrmFilter = z.object({
     )
     .refine((date) => {
       return !!date.from;
-    }, EMessages.inputErrorTypeDate),
+    }, EMessages.inputErrorTypeDate)
+    .optional(),
   expenseKey: z
     .string({ message: EMessages.inputErrorTypeString })
     .trim()
