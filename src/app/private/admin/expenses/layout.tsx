@@ -5,7 +5,7 @@ import { EExpenseTabs } from "@/utils/enums/expensesEnums";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const fnGetActualUrl = (url: string, compare: EExpenseTabs) => {
+const fnGetActualUrl = (url: string, compare: string) => {
   const arrayOfParams = url.split("/");
   const getLatestParam = arrayOfParams[arrayOfParams.length - 1];
   return getLatestParam === "expenses" && compare === EExpenseTabs.NEW

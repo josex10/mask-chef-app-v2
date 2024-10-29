@@ -32,6 +32,8 @@ const tables = [
       { column: "restaurant", table: "expenses" },
       { column: "restaurant", table: "providers" },
       { column: "restaurant", table: "expenses_payment_type" },
+      { column: "restaurant", table: "incomes_type" },
+      { column: "restaurant", table: "incomes" },
     ],
   },
   {
@@ -91,6 +93,7 @@ const tables = [
       { column: "createdBy", table: "expenses" },
       { column: "createdBy", table: "providers" },
       { column: "payedBy", table: "expenses_payment_detail" },
+      { column: "createdBy", table: "incomes" },
     ],
   },
   {
@@ -337,6 +340,37 @@ const tables = [
     ],
     revLinks: [{ column: "payment_type", table: "expenses_payment_detail" }],
   },
+  {
+    name: "incomes_type",
+    columns: [
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+      {
+        name: "name",
+        type: "text",
+        notNull: true,
+        defaultValue: "SYSTEM_TYPE",
+      },
+      { name: "description", type: "text" },
+    ],
+    revLinks: [{ column: "incomesType", table: "incomes" }],
+  },
+  {
+    name: "incomes",
+    columns: [
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+      { name: "incomesType", type: "link", link: { table: "incomes_type" } },
+      { name: "amount", type: "float", notNull: true, defaultValue: "0.0" },
+      { name: "notes", type: "text" },
+      { name: "isActive", type: "bool", notNull: true, defaultValue: "false" },
+      {
+        name: "incomeDate",
+        type: "datetime",
+        notNull: true,
+        defaultValue: "now",
+      },
+      { name: "createdBy", type: "link", link: { table: "users" } },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -372,6 +406,12 @@ export type ExpensesPaymentDetailRecord = ExpensesPaymentDetail & XataRecord;
 export type ExpensesPaymentType = InferredTypes["expenses_payment_type"];
 export type ExpensesPaymentTypeRecord = ExpensesPaymentType & XataRecord;
 
+export type IncomesType = InferredTypes["incomes_type"];
+export type IncomesTypeRecord = IncomesType & XataRecord;
+
+export type Incomes = InferredTypes["incomes"];
+export type IncomesRecord = Incomes & XataRecord;
+
 export type DatabaseSchema = {
   restaurants: RestaurantsRecord;
   countries: CountriesRecord;
@@ -383,6 +423,8 @@ export type DatabaseSchema = {
   expenses_line_detail: ExpensesLineDetailRecord;
   expenses_payment_detail: ExpensesPaymentDetailRecord;
   expenses_payment_type: ExpensesPaymentTypeRecord;
+  incomes_type: IncomesTypeRecord;
+  incomes: IncomesRecord;
 };
 
 const DatabaseClient = buildClient();
