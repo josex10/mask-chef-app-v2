@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Inter as FontSans } from "next/font/google";
+import { Inter } from 'next/font/google'
 import { Provider } from "./provider";
 import {
   ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
 } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import { Toaster } from "react-hot-toast";
 import { ReactQueryProvider } from "./providerReactQuery";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: "Mask Chef V2",
@@ -29,13 +21,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { userId } = auth();
   return (
     <html lang="es" suppressHydrationWarning={true}>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          "min-h-screen bg-background antialiased",
+          inter.className
         )}
         suppressHydrationWarning={true}
       >
@@ -46,11 +37,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {/* <div>
-                <SignedOut>
-                  <SignInButton />
-                </SignedOut>
-              </div> */}
             <ReactQueryProvider>
               <Toaster />
               {children}

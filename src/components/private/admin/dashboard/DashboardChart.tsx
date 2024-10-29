@@ -1,34 +1,30 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-  { day: "Lunes", actualWeek: 186, lastWeek: 80 },
-  { day: "Martes", actualWeek: 305, lastWeek: 200 },
-  { day: "Miércoles", actualWeek: 237, lastWeek: 120 },
-  { day: "Jueves", actualWeek: 73, lastWeek: 190 },
-  { day: "Viernes", actualWeek: 209, lastWeek: 130 },
-  { day: "Sábado", actualWeek: 214, lastWeek: 140 },
-  { day: "Domingo", actualWeek: 214, lastWeek: 140 },
-];
+import { IDashboardChartData } from "@/utils/interfaces/dashboard/IDashboardChartData";
+import { format } from "date-fns";
 
 const chartConfig = {
-  actualWeek: {
-    label: "Semana Actual",
+  incomes: {
+    label: "Ingresos",
     color: "hsl(var(--chart-1))",
   },
-  lastWeek: {
-    label: "Semana Anterior",
+  expenses: {
+    label: "Gastos",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
-const DashboardChartComponent = () => {
+type TDashboardChartProps = {
+  chartData: IDashboardChartData[];
+};
+const DashboardChartComponent = ({ chartData }: TDashboardChartProps) => {
   return (
     <ChartContainer config={chartConfig}>
       <AreaChart
@@ -40,31 +36,37 @@ const DashboardChartComponent = () => {
         }}
       >
         <CartesianGrid vertical={false} />
-        {/* <XAxis
-          dataKey="day"
+        <XAxis
+          dataKey="date"
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => value.slice(0, 3)}
-        /> */}
+          tickFormatter={(value) => format(new Date(value), "d")}
+        />
+        <YAxis
+          dataKey="maxAmount"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent indicator="dot" />}
+          content={<ChartTooltipContent indicator="dashed" />}
         />
         <Area
-          dataKey="lastWeek"
+          dataKey="expenses"
           type="natural"
-          fill="var(--color-lastWeek)"
+          fill="var(--color-expenses)"
           fillOpacity={0.4}
-          stroke="var(--color-lastWeek)"
+          stroke="var(--color-expenses)"
           stackId="a"
         />
         <Area
-          dataKey="actualWeek"
+          dataKey="incomes"
           type="natural"
-          fill="var(--color-actualWeek)"
+          fill="var(--color-incomes)"
           fillOpacity={0.4}
-          stroke="var(--color-actualWeek)"
+          stroke="var(--color-incomes)"
           stackId="a"
         />
       </AreaChart>

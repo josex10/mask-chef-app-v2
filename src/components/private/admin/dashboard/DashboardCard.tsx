@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 type TDasboardProps = {
   title: string;
   icon: JSX.Element;
-  mainTxt: string;
-  description: string;
+  mainTxt: JSX.Element;
+  description: JSX.Element;
 };
 
 const DashboardCardComponent = ({
