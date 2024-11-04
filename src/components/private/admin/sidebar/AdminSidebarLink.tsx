@@ -1,14 +1,14 @@
 import { Badge } from "@/components/ui/badge";
-import { Home, LineChart, ReceiptText, Truck } from "lucide-react";
+import { HandCoins, Home, LineChart, ReceiptText, Truck } from "lucide-react";
 import Link from "next/link";
 
 const links = [
-  // {
-  //   label: "Inicio",
-  //   icon: <Home size="25"/>,
-  //   url: "/private/admin",
-  //   badge: null,
-  // },
+  {
+    label: "Inicio",
+    icon: <Home size="25"/>,
+    url: "/private/admin",
+    badge: null,
+  },
   // {
   //   label: "Proveedores",
   //   icon: <Truck size="25" />,
@@ -19,6 +19,12 @@ const links = [
     label: "Gastos",
     icon: <ReceiptText size="25" />,
     url: "/private/admin/expenses",
+    badge: null,
+  },
+  {
+    label: "Ingresos",
+    icon: <HandCoins size="25" />,
+    url: "/private/admin/incomes",
     badge: null,
   },
   // {

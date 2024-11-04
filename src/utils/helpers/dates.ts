@@ -15,7 +15,7 @@ import {
   isEqual,
 } from "date-fns";
 import { EFilters } from "../enums/filters";
-
+import {CMonths} from "../constants/CMonths";
 export const getStardAndEndDateOfTheWeek = (date: Date) => {
   return {
     start: startOfWeek(date, { weekStartsOn: 1 }),
@@ -120,3 +120,8 @@ export const checkIfDatesAreEqualWithoutTime = (date1: Date, date2: Date) => {
   const formatDate2 = format(date2, "dd/MM/yyyy");
   return isEqual(formatDate1, formatDate2);
 }
+
+export const getMonthInSpanishFromDate = (date: Date) => {
+  const monthNumber = date.getMonth() + 1;
+  return CMonths.find((month) => month.key === monthNumber.toString())?.value;
+};

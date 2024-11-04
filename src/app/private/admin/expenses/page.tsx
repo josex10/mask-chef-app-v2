@@ -1,7 +1,6 @@
 "use client";
 
 import CardExpenseDetail from "@/components/private/admin/expenses/ExpenseDetail/CardExpenseDetail";
-import CardExpenseNew from "@/components/private/admin/expenses/ExpenseNew/CardExpenseNew";
 import CardExpenseTable from "@/components/private/admin/expenses/ExpenseTable/CardExpenseTable";
 import CardExpenseUpload from "@/components/private/admin/expenses/ExpenseUpload/CardExpenseUpload";
 import SkeletonTable from "@/components/private/admin/expenses/Skeletons/SkeletonTable";

@@ -1,3 +1,4 @@
+import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import {
   Table,
   TableBody,
@@ -6,20 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { IDashboardTableData } from "@/utils/interfaces/dashboard/IDashboardTableData";
 
-const DashboardCardTableComponent = () => {
+type TDashboardCardTableProps = {
+  tableData: IDashboardTableData[];
+};
+const DashboardCardTableComponent = ({
+  tableData,
+}: TDashboardCardTableProps) => {
   const tableHeaders = [
     { label: "Tipo", className: "" },
     { label: "Total de Ventas", className: "text-right" },
-  ];
-
-  const tableBody = [
-    { day: "Efectivo", date: "2024-07-01", amount: "$120.00" },
-    { day: "Sinpe", date: "2024-07-02", amount: "$187.00" },
-    { day: "Tarjeta", date: "2024-07-03", amount: "$250.00" },
-    { day: "Uber", date: "2024-07-04", amount: "$325.00" },
-    { day: "Didi", date: "2024-07-05", amount: "$480.00" },
-    { day: "Pedidos YA", date: "2024-07-06", amount: "$375.00" }
   ];
   return (
     <Table>
@@ -35,13 +33,15 @@ const DashboardCardTableComponent = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {tableBody.map((row, index) => {
+        {tableData.map((row, index) => {
           return (
             <TableRow key={index}>
               <TableCell>
-                <div className="font-medium">{row.day}</div>
+                <div className="font-medium">{row.type}</div>
               </TableCell>
-              <TableCell className="text-right font-medium">{row.amount}</TableCell>
+              <TableCell className="text-right font-medium">
+                <TextFieldForCurrency totalAmount={row.amount} />
+              </TableCell>
             </TableRow>
           );
         })}
