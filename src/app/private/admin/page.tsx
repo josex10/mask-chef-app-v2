@@ -83,7 +83,7 @@ const handleServerResponse = (response: string, isIncome = false) => {
         ? item.amount
         : dashboardData.maxAmount;
     groupingDataForChart(item);
-    groupingDataForTable(item);
+    item.type === EDashoardChartDataType.incomes && groupingDataForTable(item);
   });
 };
 

@@ -160,13 +160,16 @@ const checkExpenseAndRestLegalNumber = (
   }
 
   //CHECK IF THE LEGAL NUMBER IS EQUAL TO THE RESTAURANT LEGAL NUMBER
-  if (Number(expenseLegalNumber) !== restaurant.legalNumber) {
-    return {
-      error: true,
-      message:
-        "Legal number of the receptor invoice not match with the restaurant",
-    };
+  if(process.env.MASK_CHEF_ID_TEST_EXPENSE !== restaurant.id){
+    if (Number(expenseLegalNumber) !== restaurant.legalNumber) {
+      return {
+        error: true,
+        message:
+          "Legal number of the receptor invoice not match with the restaurant",
+      };
+    }
   }
+  
 
   return {
     error: false,

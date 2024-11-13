@@ -1,6 +1,7 @@
 "use client";
 
 import CardExpenseDetail from "@/components/private/admin/expenses/ExpenseDetail/CardExpenseDetail";
+import CardExpenseNew from "@/components/private/admin/expenses/ExpenseNew/CardExpenseNew";
 import CardExpenseTable from "@/components/private/admin/expenses/ExpenseTable/CardExpenseTable";
 import CardExpenseUpload from "@/components/private/admin/expenses/ExpenseUpload/CardExpenseUpload";
 import SkeletonTable from "@/components/private/admin/expenses/Skeletons/SkeletonTable";
@@ -18,7 +19,7 @@ const ExpensesPage = () => {
     <section className="xl:flex xl:flex-row xl:gap-2 xl:h-[80vh] xl:overflow-x-hidden">
       <div className=" xl:w-[58vw]">
         <div className="flex flex-col gap-2 md:flex-row xl:h-[20vh]">
-          {/* <CardExpenseNew /> */}
+          <CardExpenseNew />
           <CardExpenseUpload />
         </div>
 
