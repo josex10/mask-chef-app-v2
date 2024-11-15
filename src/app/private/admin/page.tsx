@@ -10,11 +10,12 @@ import TextFieldForCurrency from "@/components/shared/TextFieldForCurrency";
 import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverActionResponse";
 import { getMonthInSpanishFromDate } from "@/utils/helpers/dates";
 import { getSelectedRestaurantFromCookie } from "@/lib/middleware/cookies";
-import { format } from "date-fns";
+import { format, fromUnixTime, getYear } from "date-fns";
 import DashboardDateButton from "@/components/private/admin/dashboard/DashboardDateButton";
 import { EDashoardChartDataType } from "@/utils/enums/dashboard/EDashboardChartDataType";
 import { IDashboardData } from "@/utils/interfaces/dashboard/IDashboardData";
 import { IDashboardStageChartData } from "@/utils/interfaces/dashboard/IDashboardStageChartData";
+import { EDashboardButtonFilterType } from "@/utils/enums/dashboard/EDashboardButtonFilterType";
 
 const getTotalAmountCards = (
   amountOfIncomes: number,
@@ -25,8 +26,8 @@ const getTotalAmountCards = (
     {
       title: "Mes del Reporte",
       icon: <Calendar className="h-4 w-4 text-muted-foreground" />,
-      mainTxt: <span>{getMonthInSpanishFromDate(filterDate)}</span>,
-      description: <span>2024</span>,
+      mainTxt: <section className="flex justify-center items-center gap-1"><DashboardDateButton type={EDashboardButtonFilterType.PREV}/>{getMonthInSpanishFromDate(filterDate)}<DashboardDateButton type={EDashboardButtonFilterType.NEXT}/></section>,
+      description: <span>{getYear(filterDate)}</span>,
     },
     {
       title: "Ganancias",
@@ -68,6 +69,7 @@ const resetDashboardData = () => {
   dashboardData.tableIncomesArray = [];
   dashboardData.maxAmount = 0;
 };
+
 const handleServerResponse = (response: string, isIncome = false) => {
   const tmpResponse = JSON.parse(response) as IServerActionResponse;
   const incomesParseArray = tmpResponse.data as IDashboardStageChartData[];
@@ -117,6 +119,7 @@ const groupingDataForChart = (singleData: IDashboardStageChartData) => {
 };
 
 const groupingDataForTable = (singleData: IDashboardStageChartData) => {
+  if(singleData.type === EDashoardChartDataType.expenses) return;
   const incomeType = singleData.incomeType ? singleData.incomeType : "Otros";
   const groupFound = dashboardData.tableIncomesArray.find(
     (item) => item.type === incomeType
@@ -138,9 +141,14 @@ const addChartMaxAmount = () => {
   });
 };
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const {date} = await searchParams;
   resetDashboardData();
-  const filterDate = new Date();
+  const filterDate = date ? fromUnixTime(Number(date)) : new Date();
   const resutaurantSelected = await getSelectedRestaurantFromCookie();
   const incomeData = await GetIncomesAmountByDate(
     resutaurantSelected?.id || "",
@@ -176,8 +184,6 @@ export default async function Dashboard() {
             );
           })}
         </div>
-
-        <DashboardDateButton />
 
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
           <DashboardChartWrapperComponent
