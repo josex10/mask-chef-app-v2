@@ -34,6 +34,9 @@ const tables = [
       { column: "restaurant", table: "expenses_payment_type" },
       { column: "restaurant", table: "incomes_type" },
       { column: "restaurant", table: "incomes" },
+      { column: "restaurant", table: "products_category" },
+      { column: "restaurant", table: "products_unit_of_measure" },
+      { column: "restaurant", table: "products" },
     ],
   },
   {
@@ -94,6 +97,7 @@ const tables = [
       { column: "createdBy", table: "providers" },
       { column: "payedBy", table: "expenses_payment_detail" },
       { column: "createdBy", table: "incomes" },
+      { column: "createdBy", table: "products" },
     ],
   },
   {
@@ -139,6 +143,18 @@ const tables = [
         notNull: true,
         defaultValue: "now",
       },
+      {
+        name: "isElectronicInvoice",
+        type: "bool",
+        notNull: true,
+        defaultValue: "true",
+      },
+      {
+        name: "isRequiredForResturantReports",
+        type: "bool",
+        notNull: true,
+        defaultValue: "true",
+      },
     ],
     revLinks: [
       { column: "expense", table: "expenses_line_detail" },
@@ -176,7 +192,10 @@ const tables = [
       },
       { name: "createdBy", type: "link", link: { table: "users" } },
     ],
-    revLinks: [{ column: "provider", table: "expenses" }],
+    revLinks: [
+      { column: "provider", table: "expenses" },
+      { column: "providerBy", table: "products" },
+    ],
   },
   {
     name: "expenses_summary",
@@ -371,6 +390,89 @@ const tables = [
       { name: "createdBy", type: "link", link: { table: "users" } },
     ],
   },
+  {
+    name: "products_category",
+    columns: [
+      { name: "name", type: "text", notNull: true, defaultValue: "SYSTEM" },
+      { name: "description", type: "text" },
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+    ],
+    revLinks: [{ column: "category", table: "products" }],
+  },
+  {
+    name: "products_unit_of_measure",
+    columns: [
+      { name: "name", type: "text", notNull: true, defaultValue: "SYSTEM" },
+      {
+        name: "shortName",
+        type: "text",
+        notNull: true,
+        defaultValue: "SYSTEM",
+      },
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+    ],
+    revLinks: [{ column: "unitOfMeasure", table: "products" }],
+  },
+  {
+    name: "products",
+    columns: [
+      {
+        name: "name",
+        type: "text",
+        notNull: true,
+        defaultValue: "SYSTEM NAME",
+      },
+      { name: "labels", type: "multiple" },
+      { name: "price", type: "float", notNull: true, defaultValue: "0" },
+      { name: "createdBy", type: "link", link: { table: "users" } },
+      { name: "providerBy", type: "link", link: { table: "providers" } },
+      { name: "category", type: "link", link: { table: "products_category" } },
+      {
+        name: "unitOfMeasure",
+        type: "link",
+        link: { table: "products_unit_of_measure" },
+      },
+      { name: "restaurant", type: "link", link: { table: "restaurants" } },
+      {
+        name: "handleInventory",
+        type: "bool",
+        notNull: true,
+        defaultValue: "true",
+      },
+      {
+        name: "isAvailable",
+        type: "bool",
+        notNull: true,
+        defaultValue: "true",
+      },
+    ],
+    revLinks: [{ column: "product", table: "products_inventory" }],
+  },
+  {
+    name: "products_inventory",
+    columns: [
+      { name: "stock", type: "float", notNull: true, defaultValue: "0" },
+      {
+        name: "minStockLevel",
+        type: "float",
+        notNull: true,
+        defaultValue: "0",
+      },
+      {
+        name: "maxStockLevel",
+        type: "float",
+        notNull: true,
+        defaultValue: "0",
+      },
+      {
+        name: "reOrderStockLevel",
+        type: "float",
+        notNull: true,
+        defaultValue: "0",
+      },
+      { name: "product", type: "link", link: { table: "products" } },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -412,6 +514,18 @@ export type IncomesTypeRecord = IncomesType & XataRecord;
 export type Incomes = InferredTypes["incomes"];
 export type IncomesRecord = Incomes & XataRecord;
 
+export type ProductsCategory = InferredTypes["products_category"];
+export type ProductsCategoryRecord = ProductsCategory & XataRecord;
+
+export type ProductsUnitOfMeasure = InferredTypes["products_unit_of_measure"];
+export type ProductsUnitOfMeasureRecord = ProductsUnitOfMeasure & XataRecord;
+
+export type Products = InferredTypes["products"];
+export type ProductsRecord = Products & XataRecord;
+
+export type ProductsInventory = InferredTypes["products_inventory"];
+export type ProductsInventoryRecord = ProductsInventory & XataRecord;
+
 export type DatabaseSchema = {
   restaurants: RestaurantsRecord;
   countries: CountriesRecord;
@@ -425,6 +539,10 @@ export type DatabaseSchema = {
   expenses_payment_type: ExpensesPaymentTypeRecord;
   incomes_type: IncomesTypeRecord;
   incomes: IncomesRecord;
+  products_category: ProductsCategoryRecord;
+  products_unit_of_measure: ProductsUnitOfMeasureRecord;
+  products: ProductsRecord;
+  products_inventory: ProductsInventoryRecord;
 };
 
 const DatabaseClient = buildClient();

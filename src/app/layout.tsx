@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { Inter } from 'next/font/google'
+import { Inter } from "next/font/google";
 import { Provider } from "./provider";
-import {
-  ClerkProvider,
-} from "@clerk/nextjs";
-import { Toaster } from "react-hot-toast";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 import { ReactQueryProvider } from "./providerReactQuery";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Mask Chef V2",
@@ -38,8 +36,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ReactQueryProvider>
-              <Toaster />
               {children}
+              <Toaster richColors />
             </ReactQueryProvider>
           </Provider>
         </ClerkProvider>
