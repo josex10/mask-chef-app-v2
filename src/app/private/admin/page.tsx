@@ -26,7 +26,13 @@ const getTotalAmountCards = (
     {
       title: "Mes del Reporte",
       icon: <Calendar className="h-4 w-4 text-muted-foreground" />,
-      mainTxt: <section className="flex justify-center items-center gap-1"><DashboardDateButton type={EDashboardButtonFilterType.PREV}/>{getMonthInSpanishFromDate(filterDate)}<DashboardDateButton type={EDashboardButtonFilterType.NEXT}/></section>,
+      mainTxt: (
+        <section className="flex justify-center items-center gap-1">
+          <DashboardDateButton type={EDashboardButtonFilterType.PREV} />
+          {getMonthInSpanishFromDate(filterDate)}
+          <DashboardDateButton type={EDashboardButtonFilterType.NEXT} />
+        </section>
+      ),
       description: <span>{getYear(filterDate)}</span>,
     },
     {
@@ -119,7 +125,7 @@ const groupingDataForChart = (singleData: IDashboardStageChartData) => {
 };
 
 const groupingDataForTable = (singleData: IDashboardStageChartData) => {
-  if(singleData.type === EDashoardChartDataType.expenses) return;
+  if (singleData.type === EDashoardChartDataType.expenses) return;
   const incomeType = singleData.incomeType ? singleData.incomeType : "Otros";
   const groupFound = dashboardData.tableIncomesArray.find(
     (item) => item.type === incomeType
@@ -146,7 +152,7 @@ export default async function Dashboard({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const {date} = await searchParams;
+  const { date } = await searchParams;
   resetDashboardData();
   const filterDate = date ? fromUnixTime(Number(date)) : new Date();
   const resutaurantSelected = await getSelectedRestaurantFromCookie();

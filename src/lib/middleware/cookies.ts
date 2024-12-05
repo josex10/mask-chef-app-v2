@@ -31,3 +31,8 @@ export const getSelectedRestaurantFromCookie = async () => {
   if (!cookie) return null;
   return cookie.restaurantSelected;
 };
+export const getSelectedUserFromCookie = async () => {
+  const cookie = await getCookie();
+  if (!cookie) return null;
+  return cookie.user;
+};

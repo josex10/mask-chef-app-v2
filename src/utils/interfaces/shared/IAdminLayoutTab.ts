@@ -1,4 +1,4 @@
-export interface IMCLayoutTab {
+export interface IAdminLayoutTab {
     class: string;
     href: string;
     text: string;

@@ -39,3 +39,5 @@ credentials_xata.txt
 
 /_next
 /.xata
+
+*.pgerd

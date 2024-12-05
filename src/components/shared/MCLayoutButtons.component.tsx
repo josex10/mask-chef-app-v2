@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { IMCLayoutTab } from "@/utils/interfaces/shared/IMCLayoutTab";
+import { ETabsConfiguration } from "@/utils/enums/shared/EAdminTabsConfiguration";
+
 
 const HelperLayoutIsTabSelected = (
   urlComplete: string,
@@ -20,12 +21,17 @@ const HelperLayoutIsTabSelected = (
     : false;
 };
 
-const useSetClassForTabs = ({
-  appPage,
-  defaultTab,
-  tabs,
-}: TMCLayoutTabComponentProps) => {
+const useSetClassForTabs = () => {
   const pathName = usePathname();
+  const tabConfiguration = ETabsConfiguration.find((tab) => {
+    if (pathName.includes(tab.appPage)) {
+      return tab;
+    }
+  });
+
+  if(!tabConfiguration) return null;
+
+  const {tabs, appPage, defaultTab} = tabConfiguration;
   return tabs.map((tab) => {
     return {
       ...tab,
@@ -39,32 +45,11 @@ const useSetClassForTabs = ({
         : "",
     };
   });
-  //   return [
-  //     {
-  //       class: fnGetActualUrl(link, EExpenseTabs.NEW) ? "underline" : "",
-  //       href: "/private/admin/expenses",
-  //       text: "Nuevo",
-  //     },
-  //     {
-  //       class: fnGetActualUrl(link, EExpenseTabs.SEARCH) ? "underline" : "",
-  //       href: "/private/admin/expenses/search",
-  //       text: "Buscar",
-  //     },
-  //     {
-  //       class: fnGetActualUrl(link, EExpenseTabs.HACIENDA) ? "underline" : "",
-  //       href: "/private/admin/expenses/hacienda",
-  //       text: "Hacienda",
-  //     },
-  //   ];
 };
 
-type TMCLayoutTabComponentProps = {
-  tabs: IMCLayoutTab[];
-  appPage: string;
-  defaultTab: string;
-};
-const MCLayoutTabComponent = (props: TMCLayoutTabComponentProps) => {
-  const buttonLinks = useSetClassForTabs(props);
+const MCLayoutTabComponent = () => {
+  const buttonLinks = useSetClassForTabs();
+  if(!buttonLinks) return null;
   return (
     <section>
       <div className="flex flex-row w-full justify-center gap-4 bg-muted rounded-sm p-2">

@@ -10,6 +10,7 @@ type TMCInputField = {
   label: string;
   placeholder: string;
   type?:EInputType;
+  disabled?: boolean;
 };
 
 const MCInputField: React.FC<any> = ({
@@ -17,7 +18,8 @@ const MCInputField: React.FC<any> = ({
   name,
   label,
   placeholder,
-  type
+  type,
+  disabled
 }: TMCInputField) => {
   const {
     field: { ref, ...field },
@@ -40,6 +42,7 @@ const MCInputField: React.FC<any> = ({
               {...field}
               ref={ref}
               id={name}
+              disabled={disabled ? disabled : false}
             />
           </FormControl>
           <FormMessage />
