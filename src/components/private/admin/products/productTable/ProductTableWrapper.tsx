@@ -31,14 +31,13 @@ const ProductTableWrapper = async ({
     serverResponse.data as IProductsTablePaginationResponse;
 
   return (
-    <section className="mt-4">
-      <DataTable
-        columns={ProductTableColumns}
-        data={records}
-        totalCount={totalCount}
-        pageNumber={pageParse}
-      />
-    </section>
+    // <section className="p-4 rounded-xl bg-muted/50">
+    <DataTable
+      columns={ProductTableColumns}
+      data={records}
+      totalCount={totalCount}
+      pageNumber={pageParse}
+    />
   );
 };
 

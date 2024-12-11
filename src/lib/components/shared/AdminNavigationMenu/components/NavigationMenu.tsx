@@ -76,7 +76,7 @@ const NavigationMenu = () => {
   );
 
   return (
-    <section className=" flex flex-row justify-between">
+    <section className="flex flex-row justify-between">
       <h2 className="text-2xl">{getListItemsOfActualPath?.pageTitle}</h2>
       <Menubar>
         {getListItemsOfActualPath?.menuBar.map((menu, index) => (
