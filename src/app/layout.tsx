@@ -22,10 +22,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning={true}>
       <body
-        className={cn(
-          "min-h-screen bg-background antialiased",
-          inter.className
-        )}
+        className={cn("bg-background antialiased", inter.className)}
         suppressHydrationWarning={true}
       >
         <ClerkProvider afterSignOutUrl={"/sign-out"}>

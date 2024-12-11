@@ -98,8 +98,8 @@ const ProductsFilterForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="">
-        <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full p-4">
+        {/* <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
           <div className="flex flex-col gap-4 md:w-[60%] justify-center">
             <MCComboboxField
               control={form.control}
@@ -119,9 +119,6 @@ const ProductsFilterForm = ({
               data={providers ? providers : []}
               disabled={isLoading}
             />
-          </div>
-
-          <div className="flex flex-col gap-4 md:w-[40%] justify-center">
             <MCComboboxField
               control={form.control}
               name="categories"
@@ -141,9 +138,47 @@ const ProductsFilterForm = ({
               disabled={isLoading}
             />
           </div>
+        </div> */}
+        <div className="flex flex-col md:flex-row gap-4 bg-primary-foreground p-4 border rounded-xl">
+          <MCComboboxField
+            control={form.control}
+            name="name"
+            label="Producto"
+            placeholder="Seleccione"
+            placeholderSearch="Buscar..."
+            data={products ? products : []}
+            disabled={isLoading}
+          />
+          <MCComboboxField
+            control={form.control}
+            name="providers"
+            label="Proveedores"
+            placeholder="Seleccione"
+            placeholderSearch="Buscar..."
+            data={providers ? providers : []}
+            disabled={isLoading}
+          />
+          <MCComboboxField
+            control={form.control}
+            name="categories"
+            label="Categorías"
+            placeholder="Seleccione"
+            placeholderSearch="Buscar..."
+            data={categories ? categories : []}
+            disabled={isLoading}
+          />
+          <MCComboboxField
+            control={form.control}
+            name="unitOfMeasures"
+            label="Unidades de medida"
+            placeholder="Seleccione"
+            placeholderSearch="Buscar..."
+            data={unitOfMeasures ? unitOfMeasures : []}
+            disabled={isLoading}
+          />
         </div>
 
-        {isLoading ? (
+        {/* {isLoading ? (
           <div className="flex justify-center mt-4">
             <LoadingSpinner size={24} className="animate-spin" />
           </div>
@@ -156,7 +191,7 @@ const ProductsFilterForm = ({
               Filtrar
             </Button>
           </div>
-        )}
+        )} */}
       </form>
     </Form>
   );

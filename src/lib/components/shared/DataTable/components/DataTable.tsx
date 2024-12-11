@@ -16,14 +16,11 @@ export default function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="rounded-md border">
-        <Table>
-          <DataTableHeader table={table} />
-          <DataTableBody table={table} columnsLength={columns.length} />
-        </Table>
-      </div>
-
+    <div className="m-4">
+      <Table className="border">
+        <DataTableHeader table={table} />
+        <DataTableBody table={table} columnsLength={columns.length} />
+      </Table>
       <DataTablePagination
         pageNumber={pageNumber}
         totalCount={totalCount}

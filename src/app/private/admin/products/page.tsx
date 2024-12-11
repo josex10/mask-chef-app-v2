@@ -10,11 +10,13 @@ const Products = async ({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
   return (
-    <section className="flex w-full xl:flex-row">
-      <div className="w-full">
+    <section className="flex flex-1 flex-col shrink-0">
+      <div className="">
         <Suspense fallback={<ProductFilterSkeleton />}>
           <ProductFilterWrapper />
         </Suspense>
+      </div>
+      <div className="">
         <Suspense fallback={<DataTableSkeleton />}>
           <ProductTableWrapper searchParams={searchParams} />
         </Suspense>
