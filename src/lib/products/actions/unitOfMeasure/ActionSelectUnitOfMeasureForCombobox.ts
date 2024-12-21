@@ -4,8 +4,7 @@ import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverAc
 import { IComboboxOption } from "@/utils/interfaces/shared/IComboboxOption";
 import { getXataClient } from "@/xata";
 
-
-export const selectProductsUnitOfMeasureForComboboxOption =
+export const ActionSelectUnitOfMeasureForCombobox =
   async (): Promise<IServerActionResponse> => {
     try {
       const xata = getXataClient();

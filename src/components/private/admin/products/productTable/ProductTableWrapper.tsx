@@ -2,7 +2,7 @@
 import { ProductTableColumns } from "./ProductTableColumns";
 import { actionProductSelectFilter } from "@/lib/actions/private/admin/products/ActionProductSelectFilter";
 import { IProductsTablePaginationResponse } from "@/utils/interfaces/products/IProductsTablePaginationResponse";
-import { DataTable } from "@/lib/components/shared/DataTable";
+import { DataTable } from "@/lib/shared/DataTable";
 
 const ProductTableWrapper = async ({
   searchParams,

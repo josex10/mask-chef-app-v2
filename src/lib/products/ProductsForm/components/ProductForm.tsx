@@ -7,7 +7,6 @@ import MCInputField from "@/components/shared/MCInputField";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { saveProduct } from "@/lib/actions/private/admin/products/ActionProductSaveProduct";
-import { IComboboxOption } from "@/utils/interfaces/shared/IComboboxOption";
 import { SchemaProductData } from "@/utils/schemas/products/SchemaProductsData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -15,64 +14,80 @@ import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { IProductFormProps } from "../interfaces";
+import { EProductFormType } from "../enums";
+import { IProduct } from "../../interfaces";
+import { ActionEditProduct } from "../actions/ActionEditProduct";
 
-type TProductDataFormProps = {
-  categories: IComboboxOption[];
-  providers: IComboboxOption[];
-  unitOfMeasures: IComboboxOption[];
-};
-
-const useGetFormConfiguration = () => {
+const useGetFormConfiguration = (
+  product: IProduct | null,
+  formType: EProductFormType
+) => {
   return {
     form: useForm<z.infer<typeof SchemaProductData>>({
       resolver: zodResolver(SchemaProductData),
-      defaultValues: setDefaultValues(),
+      defaultValues: setDefaultValues(product, formType),
     }),
   };
 };
 
-const setDefaultValues = () => {
+const setDefaultValues = (
+  product: IProduct | null,
+  formType: EProductFormType
+) => {
+  const requiredFillValues =
+    formType === EProductFormType.EDIT && product ? true : false;
   return {
-    name: "",
-    minStockLevel: 0,
-    maxStockLevel: 0,
-    reOrderStockLevel: 0,
-    isAvailable: true,
-    inventoryRequired: true,
-    price: 0,
+    name: requiredFillValues ? product?.name : "",
+    minStockLevel: requiredFillValues ? product?.minStockLevel : 0,
+    maxStockLevel: requiredFillValues ? product?.maxStockLevel : 0,
+    reOrderStockLevel: requiredFillValues ? product?.reOrderStockLevel : 0,
+    isAvailable: requiredFillValues ? product?.isAvailable : true,
+    inventoryRequired: requiredFillValues ? product?.handleInventory : false,
+    price: requiredFillValues ? product?.price : 0,
+    providers: requiredFillValues ? product?.providerBy : "",
+    categories: requiredFillValues ? product?.category : "",
+    unitOfMeasures: requiredFillValues ? product?.unitOfMeasure : "",
   };
 };
 
-const ProductDataForm = ({
+const ProductForm = ({
   categories,
   providers,
   unitOfMeasures,
-}: TProductDataFormProps) => {
+  formType,
+  product,
+}: IProductFormProps) => {
   const router = useRouter();
-  const { form } = useGetFormConfiguration();
+  const { form } = useGetFormConfiguration(product, formType);
   const [isLoading, setIsLoading] = useState(false);
   const [handleInventory, setHandleInventory] = useState(
     form.getValues().inventoryRequired
   );
+
   const handleSubmit: SubmitHandler<z.infer<typeof SchemaProductData>> = async (
     data
   ) => {
     try {
       setIsLoading(true);
-      const result = await saveProduct(data);
-      result.error ? toast(result.message) : toast(result.message);
-      !result.error && form.reset(setDefaultValues());
-      toast.success(`El Producto ${data.name} ha sido creado correctamente`, {
+      const result =
+        formType === EProductFormType.CREATE
+          ? await saveProduct(data)
+          : await ActionEditProduct(data, product?.id);
+      if (result.error) throw new Error(result.message);
+      toast.success(result.message, {
         description: new Date().toLocaleString(),
-        action: {
-          label: "Ver Producto",
-          onClick: () =>
-            router.push(`/private/admin/products/view/${result.data}`),
-        },
       });
       setIsLoading(false);
-    } catch (error) {
-      console.log("Error al enviar el formulario", error);
+      if (formType === EProductFormType.CREATE) {
+        router.push(`/private/admin//products/view/${result.data}`);
+      }
+    } catch (error: any) {
+      toast.error(`${error && error}`, {
+        description: new Date().toLocaleString(),
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,11 +107,22 @@ const ProductDataForm = ({
     return () => subscription.unsubscribe();
   }, [form, handleInventory]);
 
+  useEffect(() => {
+    if (formType === EProductFormType.EDIT && !product) {
+      toast.error("No se encontró el producto", {
+        description: new Date().toLocaleString(),
+      });
+      router.push("/private/admin/products");
+    }
+  }, [formType, product, router]);
+
   return (
     <Form {...form}>
       <section className="shadow-2xl border border-solid rounded-lg m-2">
         <p className="flex items-center font-bold bg-muted rounded-t-lg h-16 px-8">
-          Crear Producto
+          {formType === EProductFormType.EDIT
+            ? "Editar Producto"
+            : "Crear Producto"}
         </p>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -204,7 +230,7 @@ const ProductDataForm = ({
           ) : (
             <div className="flex justify-end gap-4 mt-4">
               <Button type="submit" variant="default" disabled={isLoading}>
-                Crear
+                {formType === EProductFormType.EDIT ? "Editar" : "Crear"}
               </Button>
             </div>
           )}
@@ -214,4 +240,4 @@ const ProductDataForm = ({
   );
 };
 
-export default ProductDataForm;
+export default ProductForm;

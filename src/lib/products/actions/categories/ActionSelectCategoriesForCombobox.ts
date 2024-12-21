@@ -4,7 +4,7 @@ import { IServerActionResponse } from "@/utils/interfaces/private/admin/serverAc
 import { IComboboxOption } from "@/utils/interfaces/shared/IComboboxOption";
 import { getXataClient } from "@/xata";
 
-export const selectProvidersForComboboxOption =
+export const ActionSelectCategoriesForCombobox =
   async (): Promise<IServerActionResponse> => {
     try {
       const xata = getXataClient();
@@ -14,7 +14,7 @@ export const selectProvidersForComboboxOption =
       if (!resutaurantSelected?.id)
         throw new Error("No se ha seleccionado un restaurante");
 
-      const records = await xata.db.providers
+      const records = await xata.db.products_category
         .select(["id", "name"])
         .filter({
           restaurant: resutaurantSelected.id,
