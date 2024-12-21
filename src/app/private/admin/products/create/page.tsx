@@ -1,17 +1,20 @@
-import ProductDataSkeleton from '@/components/private/admin/products/productData/ProductDataSkeleton'
-import ProductDataWrapper from '@/components/private/admin/products/productData/ProductDataWrapper'
-import React, { Suspense } from 'react'
+import {
+  ProductFormSkeleton,
+  ProductFormWrapper,
+} from "@/lib/products/ProductsForm";
+import { EProductFormType } from "@/lib/products/ProductsForm/enums";
+import React, { Suspense } from "react";
 
 const ProductsCreatePage = () => {
   return (
     <>
       <div className="hidden w-full xl:block xl:max-w-96">
-        <Suspense fallback={<ProductDataSkeleton />}>
-          <ProductDataWrapper />
+        <Suspense fallback={<ProductFormSkeleton />}>
+          <ProductFormWrapper formType={EProductFormType.CREATE} />
         </Suspense>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ProductsCreatePage
+export default ProductsCreatePage;

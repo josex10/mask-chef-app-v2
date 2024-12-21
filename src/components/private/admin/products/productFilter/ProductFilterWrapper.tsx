@@ -1,15 +1,15 @@
 import ProductsFilterForm from "./ProductFilterForm";
 import { IComboboxOption } from "@/utils/interfaces/shared/IComboboxOption";
-import { selectProvidersForComboboxOption } from "@/lib/actions/private/admin/providers/ActionProvidersSelect";
-import { selectProductsCategoriesForComboboxOption } from "@/lib/actions/private/admin/products/categories/ActionProductCategoriesSelect";
-import { selectProductsUnitOfMeasureForComboboxOption } from "@/lib/actions/private/admin/products/unitOfMeasure/ActionProductUnitOfMeasureSelect";
 import { selectProductsForComboboxOption } from "@/lib/actions/private/admin/products/ActionProductSelect";
+import { ActionSelectProviderForCombobox } from "@/lib/providers/actions";
+import { ActionSelectCategoriesForCombobox } from "@/lib/products/actions/categories";
+import { ActionSelectUnitOfMeasureForCombobox } from "@/lib/products/actions/unitOfMeasure";
 
 const ProductFilterWrapper = async () => {
   const products = await selectProductsForComboboxOption();
-  const providers = await selectProvidersForComboboxOption();
-  const categories = await selectProductsCategoriesForComboboxOption();
-  const unitOfMeasures = await selectProductsUnitOfMeasureForComboboxOption();
+  const providers = await ActionSelectProviderForCombobox();
+  const categories = await ActionSelectCategoriesForCombobox();
+  const unitOfMeasures = await ActionSelectUnitOfMeasureForCombobox();
   if (providers.error || categories.error || unitOfMeasures.error) {
     //TODO: handle error - Create a component error to handle error from the data server
     return "error";
